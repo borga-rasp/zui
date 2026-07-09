@@ -1,6 +1,4 @@
-import { Card, CardActionArea, CardContent, CardMedia, Grid, Stack, Tooltip, Typography } from '@mui/material';
-import { makeStyles } from '@mui/styles';
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router';
 
 // placeholder images
@@ -12,7 +10,28 @@ import repocube4 from '../../assets/repocube-4.png';
 import { isEmpty } from 'lodash';
 import { VulnerabilityIconCheck } from 'utilities/vulnerabilityAndSignatureCheck';
 
-// temporary utility to get image
+// Custom Tooltip component in pure Tailwind CSS
+const Tooltip = ({ title, children }) => {
+  const [show, setShow] = useState(false);
+  return (
+    <div 
+      className="group relative inline-flex items-center"
+      onMouseEnter={() => setShow(true)}
+      onMouseLeave={() => setShow(false)}
+    >
+      {children}
+      {title && show && (
+        <div className="absolute bottom-full left-1/2 z-[2000] mb-2 -translate-x-1/2 select-none pointer-events-none">
+          <div className="bg-slate-900 border border-slate-800 text-slate-100 text-xs rounded-lg px-2.5 py-1.5 shadow-xl max-w-xs whitespace-normal text-left">
+            {title}
+          </div>
+          <div className="w-2.5 h-2.5 bg-slate-900 border-r border-b border-slate-800 rotate-45 absolute -bottom-1.5 left-1/2 -translate-x-1/2" />
+        </div>
+      )}
+    </div>
+  );
+};
+
 const randomIntFromInterval = (min, max) => {
   return Math.floor(Math.random() * (max - min + 1) + min);
 };
@@ -22,50 +41,7 @@ const randomImage = () => {
   return imageArray[randomIntFromInterval(0, 3)];
 };
 
-const useStyles = makeStyles(() => ({
-  card: {
-    marginBottom: 2,
-    display: 'flex',
-    flexDirection: 'row',
-    alignItems: 'center',
-    background: '#FFFFFF',
-    boxShadow: '0rem 0.3125rem 0.625rem rgba(131, 131, 131, 0.08)',
-    borderRadius: '1.5rem',
-    borderColor: '#FFFFFF',
-    flex: 'none',
-    alignSelf: 'stretch',
-    flexGrow: 0,
-    order: 0,
-    width: '100%',
-    maxWidth: '16.875rem',
-    maxHeight: '8.625rem'
-  },
-  avatar: {
-    height: '1.4375rem',
-    width: '1.4375rem',
-    objectFit: 'fill'
-  },
-  cardBtn: {
-    height: '100%',
-    width: '100%'
-  },
-  media: {
-    borderRadius: '3.125rem'
-  },
-  content: {
-    textAlign: 'left',
-    color: '#606060'
-  },
-  signedBadge: {
-    color: '#9ccc65',
-    height: '1.375rem',
-    width: '1.375rem',
-    marginLeft: 10
-  }
-}));
-
 function PreviewCard(props) {
-  const classes = useStyles();
   const navigate = useNavigate();
   const { name, vulnerabilityData, logo } = props;
 
@@ -74,48 +50,26 @@ function PreviewCard(props) {
   };
 
   return (
-    <Card variant="outlined" className={classes.card}>
-      <CardActionArea onClick={() => goToDetails()} className={classes.cardBtn}>
-        <CardContent className={classes.content}>
-          <Grid container spacing={1}>
-            <Grid container item xs={12}>
-              <Stack direction="row" spacing={4} sx={{ display: 'flex', alignItems: 'left', flexWrap: 'wrap' }}>
-                <CardMedia
-                  classes={{
-                    root: classes.media,
-                    img: classes.avatar
-                  }}
-                  component="img"
-                  image={!isEmpty(logo) ? `data:image/png;base64, ${logo}` : randomImage()}
-                  alt="icon"
-                />
-                <Tooltip title={name} placement="top">
-                  <Typography
-                    variant="h5"
-                    component="div"
-                    sx={{
-                      size: '1.5rem',
-                      lineHeight: '2rem',
-                      color: '#220052',
-                      width: '5rem',
-                      whiteSpace: 'nowrap',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis'
-                    }}
-                  >
-                    {name}
-                  </Typography>
-                </Tooltip>
-                <Stack direction="row" spacing={0.5} sx={{ marginLeft: 'auto', marginRight: 0 }}>
-                  <VulnerabilityIconCheck {...vulnerabilityData} />
-                </Stack>
-              </Stack>
-            </Grid>
-            <Grid item xs={12} mt={2}></Grid>
-          </Grid>
-        </CardContent>
-      </CardActionArea>
-    </Card>
+    <div
+      onClick={goToDetails}
+      className="group w-full max-w-[270px] bg-slate-900 border border-slate-800 hover:border-slate-700/80 rounded-2xl p-4 hover:bg-slate-900/80 transition-all duration-200 cursor-pointer shadow-lg text-left"
+    >
+      <div className="flex items-center justify-between gap-3">
+        <img
+          src={!isEmpty(logo) ? `data:image/png;base64, ${logo}` : randomImage()}
+          alt="icon"
+          className="w-6 h-6 object-contain rounded"
+        />
+        <Tooltip title={name}>
+          <h4 className="text-sm font-bold text-white group-hover:text-blue-400 transition truncate max-w-[100px]">
+            {name}
+          </h4>
+        </Tooltip>
+        <div className="ml-auto shrink-0">
+          <VulnerabilityIconCheck {...vulnerabilityData} />
+        </div>
+      </div>
+    </div>
   );
 }
 

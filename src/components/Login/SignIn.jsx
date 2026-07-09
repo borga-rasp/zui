@@ -7,144 +7,8 @@ import { api, endpoints } from '../../api';
 import { host } from '../../host';
 import { isEmpty, isObject } from 'lodash';
 
-// components
-import { Card, CardContent, CssBaseline } from '@mui/material';
-
-import Button from '@mui/material/Button';
-import TextField from '@mui/material/TextField';
-import Box from '@mui/material/Box';
-import Divider from '@mui/material/Divider';
-import Stack from '@mui/material/Stack';
-import Typography from '@mui/material/Typography';
-import Alert from '@mui/material/Alert';
-import CircularProgress from '@mui/material/CircularProgress';
 import Loading from '../Shared/Loading';
-
 import { GoogleLoginButton, GithubLoginButton, GitlabLoginButton, OIDCLoginButton } from './ThirdPartyLoginComponents';
-
-// styling
-import { makeStyles } from '@mui/styles';
-
-const useStyles = makeStyles(() => ({
-  cardContainer: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    position: 'relative'
-  },
-  loginCard: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: '60%',
-    height: '60%',
-    background: '#FFFFFF',
-    boxShadow: '0rem 0.3125rem 0.625rem rgba(131, 131, 131, 0.08)',
-    borderRadius: '0.75rem',
-    minWidth: '30rem'
-  },
-  loginCardContent: {
-    display: 'flex',
-    flexDirection: 'column',
-    border: '0.1875rem black',
-    width: '100%',
-    padding: '3rem'
-  },
-  text: {
-    color: '#14191F',
-    width: '100%',
-    fontSize: '1.5rem',
-    lineHeight: '2.25rem',
-    letterSpacing: '-0.01rem',
-    marginBottom: '0.25rem'
-  },
-  subtext: {
-    color: '#52637A',
-    width: '100%',
-    fontSize: '1rem',
-    marginBottom: '2.375rem'
-  },
-  textField: {
-    borderRadius: '0.25rem',
-    marginTop: 0,
-    marginBottom: '1.5rem'
-  },
-  textColor: {
-    color: '#8596AD'
-  },
-  labelColor: {
-    color: '#667C99',
-    '&:focused': {
-      color: '#667C99'
-    }
-  },
-  continueButton: {
-    textTransform: 'none',
-    background: '#F15527',
-    color: '#FFFFFF',
-    fontSize: '1.438rem',
-    fontWeight: '600',
-    height: '3.125rem',
-    borderRadius: '0.25rem',
-    letterSpacing: '0.01rem',
-    marginBottom: '1rem',
-    padding: 0,
-    boxShadow: 'none',
-    '&:hover': {
-      backgroundColor: '#F15527',
-      boxShadow: 'none'
-    }
-  },
-  continueAsGuestButton: {
-    textTransform: 'none',
-    background: '#FFFFFF',
-    color: '#52637A',
-    fontSize: '1.438rem',
-    fontWeight: '600',
-    height: '3.125rem',
-    borderRadius: '0.25rem',
-    border: '1px solid #52637A',
-    letterSpacing: '0.01rem',
-    marginBottom: '1rem',
-    padding: 0,
-    boxShadow: 'none',
-    '&:hover': {
-      backgroundColor: '#FFFFFF',
-      boxShadow: 'none'
-    }
-  },
-  gitLogo: {
-    height: '24px',
-    borderRadius: '0.25rem',
-    paddingLeft: '1rem'
-  },
-  line: {
-    width: '100%',
-    textAlign: 'center',
-    borderBottom: '0.0625rem solid #C2CBD6',
-    lineHeight: '0.1rem',
-    margin: '0.625rem 0 1.25rem'
-  },
-  lineSpan: {
-    background: '#ffffff',
-    color: '#C2CBD6',
-    padding: '0 0.625rem',
-    fontSize: '1rem',
-    fontWeight: '400',
-    paddingLeft: '1rem',
-    paddingRight: '1rem'
-  },
-  divider: {
-    color: '#C2CBD6',
-    marginBottom: '2rem',
-    width: '100%'
-  },
-  thirdPartyLoginContainer: {
-    width: '100%',
-    marginBottom: '2rem'
-  }
-}));
 
 export default function SignIn({ isLoggedIn, setIsLoggedIn, wrapperSetLoading = () => {} }) {
   const [usernameError, setUsernameError] = useState(null);
@@ -158,7 +22,6 @@ export default function SignIn({ isLoggedIn, setIsLoggedIn, wrapperSetLoading = 
   const [isGuestLoginEnabled, setIsGuestLoginEnabled] = useState(false);
   const abortController = useMemo(() => new AbortController(), []);
   const navigate = useNavigate();
-  const classes = useStyles();
 
   useEffect(() => {
     setIsLoading(true);
@@ -315,101 +178,111 @@ export default function SignIn({ isLoggedIn, setIsLoggedIn, wrapperSetLoading = 
     let oidcName = authMethods.openid?.providers?.oidc?.name;
 
     return (
-      <Stack direction="column" spacing="1rem" className={classes.thirdPartyLoginContainer}>
+      <div className="flex flex-col gap-3 w-full mb-6">
         {isGithub && <GithubLoginButton handleClick={handleClickExternalLogin} />}
         {isGoogle && <GoogleLoginButton handleClick={handleClickExternalLogin} />}
         {isGitlab && <GitlabLoginButton handleClick={handleClickExternalLogin} />}
         {isOIDC && <OIDCLoginButton handleClick={handleClickExternalLogin} oidcName={oidcName} />}
-      </Stack>
+      </div>
     );
   };
 
   return (
-    <div className={classes.cardContainer} data-testid="signin-container">
+    <div className="w-full max-w-md mx-auto flex items-center justify-center relative p-6" data-testid="signin-container">
       {isLoading ? (
         <Loading />
       ) : (
-        <Card className={classes.loginCard}>
-          <CardContent className={classes.loginCardContent}>
-            <CssBaseline />
-            <Typography align="left" className={classes.text} component="h1" variant="h4">
-              Sign In
-            </Typography>
-            <Typography align="left" className={classes.subtext} variant="body1" gutterBottom>
-              Welcome back! Please login.
-            </Typography>
-            {renderThirdPartyLoginMethods()}
-            {Object.keys(authMethods).length > 1 &&
-              Object.keys(authMethods).includes('openid') &&
-              Object.keys(authMethods.openid.providers).length > 0 && (
-                <Divider className={classes.divider} data-testid="openid-divider">
-                  or
-                </Divider>
-              )}
-            {Object.keys(authMethods).includes('htpasswd') && (
-              <Box component="form" onSubmit={null} noValidate autoComplete="off">
-                <TextField
-                  margin="normal"
-                  required
-                  fullWidth
+        <div className="w-full bg-[#111827] border border-[#1f2937] shadow-xl rounded-2xl p-8 flex flex-col">
+          <div className="mb-8 text-left">
+            <h1 className="text-3xl font-bold text-white mb-2">Sign In</h1>
+            <p className="text-slate-400 text-sm">Welcome back! Please login.</p>
+          </div>
+
+          {renderThirdPartyLoginMethods()}
+
+          {Object.keys(authMethods).length > 1 &&
+            Object.keys(authMethods).includes('openid') &&
+            Object.keys(authMethods.openid.providers).length > 0 && (
+              <div className="relative flex py-4 items-center w-full" data-testid="openid-divider">
+                <div className="flex-grow border-t border-slate-700"></div>
+                <span className="flex-shrink mx-4 text-slate-500 text-sm">or</span>
+                <div className="flex-grow border-t border-slate-700"></div>
+              </div>
+            )}
+
+          {Object.keys(authMethods).includes('htpasswd') && (
+            <form onSubmit={(e) => e.preventDefault()} className="space-y-5" noValidate autoComplete="off">
+              <div>
+                <label className="block text-sm font-medium text-slate-300 mb-1.5" htmlFor="username">
+                  Username
+                </label>
+                <input
                   id="username"
-                  label="Username"
                   name="username"
-                  className={classes.textField}
-                  inputProps={{ className: classes.textColor }}
-                  InputLabelProps={{ className: classes.labelColor }}
-                  onInput={(e) => handleChange(e, 'username')}
-                  error={usernameError != null}
-                  helperText={usernameError}
-                  onKeyDown={(e) => handleLoginInputFieldKeyDown(e)}
-                />
-                <TextField
-                  margin="normal"
+                  type="text"
                   required
-                  fullWidth
-                  name="password"
-                  label="Enter password"
-                  type="password"
-                  id="password"
-                  className={classes.textField}
-                  inputProps={{ className: classes.textColor }}
-                  InputLabelProps={{ className: classes.labelColor }}
-                  onInput={(e) => handleChange(e, 'password')}
-                  error={passwordError != null}
-                  helperText={passwordError}
+                  className={`w-full bg-slate-900 border ${
+                    usernameError ? 'border-red-500 focus:ring-red-500/20 focus:border-red-500' : 'border-slate-700 focus:ring-blue-500/20 focus:border-blue-500'
+                  } rounded-lg py-2.5 px-3.5 text-white placeholder-slate-500 focus:outline-none focus:ring-4 transition duration-200`}
+                  placeholder="Enter username"
+                  onChange={(e) => handleChange(e, 'username')}
                   onKeyDown={(e) => handleLoginInputFieldKeyDown(e)}
                 />
-                {requestProcessing && <CircularProgress style={{ marginTop: 20 }} color="secondary" />}
-                {requestError && (
-                  <Alert style={{ marginTop: 20 }} severity="error">
-                    Authentication Failed. Please try again.
-                  </Alert>
-                )}
-                <div>
-                  <Button
-                    fullWidth
-                    variant="contained"
-                    className={classes.continueButton}
-                    onClick={handleClick}
-                    data-testid="basic-auth-submit-btn"
-                  >
-                    Continue
-                  </Button>
+                {usernameError && <p className="mt-1 text-xs text-red-500">{usernameError}</p>}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-300 mb-1.5" htmlFor="password">
+                  Enter Password
+                </label>
+                <input
+                  id="password"
+                  name="password"
+                  type="password"
+                  required
+                  className={`w-full bg-slate-900 border ${
+                    passwordError ? 'border-red-500 focus:ring-red-500/20 focus:border-red-500' : 'border-slate-700 focus:ring-blue-500/20 focus:border-blue-500'
+                  } rounded-lg py-2.5 px-3.5 text-white placeholder-slate-500 focus:outline-none focus:ring-4 transition duration-200`}
+                  placeholder="Enter password"
+                  onChange={(e) => handleChange(e, 'password')}
+                  onKeyDown={(e) => handleLoginInputFieldKeyDown(e)}
+                />
+                {passwordError && <p className="mt-1 text-xs text-red-500">{passwordError}</p>}
+              </div>
+
+              {requestProcessing && (
+                <div className="flex justify-center py-2">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
                 </div>
-              </Box>
-            )}
-            {isGuestLoginEnabled && (
-              <Button
-                fullWidth
-                variant="contained"
-                className={classes.continueAsGuestButton}
-                onClick={handleGuestClick}
+              )}
+
+              {requestError && (
+                <div className="bg-red-500/10 border border-red-500/30 text-red-400 text-sm rounded-lg p-3.5 text-left">
+                  Authentication Failed. Please try again.
+                </div>
+              )}
+
+              <button
+                type="button"
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition duration-200 shadow-md cursor-pointer hover:shadow-lg focus:outline-none focus:ring-4 focus:ring-blue-500/30 text-lg"
+                onClick={handleClick}
+                data-testid="basic-auth-submit-btn"
               >
-                Continue as guest
-              </Button>
-            )}
-          </CardContent>
-        </Card>
+                Continue
+              </button>
+            </form>
+          )}
+
+          {isGuestLoginEnabled && (
+            <button
+              type="button"
+              className="w-full mt-4 bg-transparent hover:bg-slate-800 border border-slate-600 text-slate-300 hover:text-white font-semibold py-3 px-4 rounded-lg transition duration-200 cursor-pointer text-lg"
+              onClick={handleGuestClick}
+            >
+              Continue as guest
+            </button>
+          )}
+        </div>
       )}
     </div>
   );

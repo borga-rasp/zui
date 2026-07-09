@@ -1,30 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { makeStyles } from '@mui/styles';
 import { isEmpty } from 'lodash';
-import { Typography, Stack } from '@mui/material';
 import ReferrerCard from '../../Shared/ReferrerCard';
 import Loading from '../../Shared/Loading';
 import { mapReferrer } from 'utilities/objectModels';
-
-const useStyles = makeStyles(() => ({
-  title: {
-    color: 'rgba(0, 0, 0, 0.87)',
-    fontSize: '1.5rem',
-    fontWeight: '600',
-    paddingTop: '0.5rem'
-  },
-  none: {
-    color: '#52637A',
-    fontSize: '1.4rem',
-    fontWeight: '600'
-  }
-}));
 
 function ReferredBy(props) {
   const { referrers } = props;
   const [referrersData, setReferrersData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const classes = useStyles();
 
   useEffect(() => {
     if (!isEmpty(referrers)) {
@@ -51,20 +34,18 @@ function ReferredBy(props) {
         );
       })
     ) : (
-      <div>{!isLoading && <Typography className={classes.none}> Nothing found </Typography>}</div>
+      <div>{!isLoading && <div className="text-slate-400 font-medium py-6 text-center"> Nothing found </div>}</div>
     );
   };
 
   return (
-    <div data-testid="referred-by-container">
-      <Typography variant="h4" gutterBottom component="div" align="left" className={classes.title}>
+    <div data-testid="referred-by-container" className="flex flex-col gap-4 text-left">
+      <h2 className="text-xl font-bold text-white tracking-tight border-b border-slate-800 pb-3 mb-2">
         Referred By
-      </Typography>
-      <Stack direction="column" spacing={2}>
-        <Stack direction="column" spacing={2}>
-          {isLoading ? <Loading /> : renderReferrers()}
-        </Stack>
-      </Stack>
+      </h2>
+      <div className="flex flex-col gap-3">
+        {isLoading ? <Loading /> : renderReferrers()}
+      </div>
     </div>
   );
 }

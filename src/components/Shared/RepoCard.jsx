@@ -11,26 +11,7 @@ import { api, endpoints } from '../../api';
 import { host } from '../../host';
 import { isAuthenticated } from '../../utilities/authUtilities';
 
-// components
-import {
-  Card,
-  CardActionArea,
-  CardMedia,
-  CardContent,
-  Typography,
-  Stack,
-  Chip,
-  Grid,
-  Tooltip,
-  IconButton,
-  useMediaQuery
-} from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
-import BookmarkIcon from '@mui/icons-material/Bookmark';
-import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
-import StarIcon from '@mui/icons-material/Star';
-import StarBorderIcon from '@mui/icons-material/StarBorder';
-import { useTheme } from '@emotion/react';
+import { Bookmark, Star } from 'lucide-react';
 
 import { VulnerabilityIconCheck, SignatureIconCheck } from 'utilities/vulnerabilityAndSignatureCheck';
 import { Markdown } from 'utilities/MarkdowntojsxWrapper';
@@ -42,6 +23,29 @@ import repocube2 from '../../assets/repocube-2.png';
 import repocube3 from '../../assets/repocube-3.png';
 import repocube4 from '../../assets/repocube-4.png';
 
+// Custom Tooltip component in pure Tailwind CSS
+// Custom Tooltip component in pure Tailwind CSS with hover state for test compatibility
+const Tooltip = ({ title, children, className = "inline-flex" }) => {
+  const [show, setShow] = useState(false);
+  return (
+    <div 
+      className={`group relative items-center ${className}`}
+      onMouseEnter={() => setShow(true)}
+      onMouseLeave={() => setShow(false)}
+    >
+      {children}
+      {title && show && (
+        <div className="absolute bottom-full left-1/2 z-[2000] mb-2 -translate-x-1/2 select-none pointer-events-none">
+          <div className="bg-slate-900 border border-slate-800 text-slate-100 text-xs rounded-lg px-2.5 py-1.5 shadow-xl max-w-xs whitespace-normal text-left">
+            {title}
+          </div>
+          <div className="w-2 h-2 bg-slate-900 border-r border-b border-slate-800 rotate-45 absolute -bottom-1 left-1/2 -translate-x-1/2" />
+        </div>
+      )}
+    </div>
+  );
+};
+
 // temporary utility to get image
 const randomIntFromInterval = (min, max) => {
   return Math.floor(Math.random() * (max - min + 1) + min);
@@ -52,131 +56,10 @@ const randomImage = () => {
   return imageArray[randomIntFromInterval(0, 3)];
 };
 
-const useStyles = makeStyles((theme) => ({
-  card: {
-    marginBottom: '1rem',
-    display: 'flex',
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    borderColor: '#FFFFFF',
-    borderRadius: '0.75rem',
-    boxShadow: '0rem 0.313rem 0.625rem rgba(131, 131, 131, 0.08)',
-    flex: 'none',
-    alignSelf: 'stretch',
-    flexGrow: 0,
-    width: '100%',
-    maxWidth: '72rem',
-    '&:hover': {
-      boxShadow: '0rem 1.1875rem 1.4375rem rgba(131, 131, 131, 0.19)',
-      borderRadius: '0.75rem'
-    }
-  },
-  avatar: {
-    height: '1.4375rem',
-    width: '1.4375rem',
-    objectFit: 'fill'
-  },
-  cardBtn: {
-    height: '100%',
-    width: '100%',
-    borderRadius: '0.75rem',
-    borderColor: '#FFFFFF',
-    '&:hover $focusHighlight': {
-      opacity: 0
-    }
-  },
-  focusHighlight: {},
-  media: {
-    borderRadius: '3.125rem'
-  },
-  content: {
-    textAlign: 'left',
-    color: '#606060',
-    maxHeight: '9.25rem',
-    backgroundColor: '#FFFFFF',
-    padding: '1.188rem 1rem',
-    '&:hover': {
-      backgroundColor: '#FFFFFF'
-    }
-  },
-  contentRight: {
-    justifyContent: 'flex-end',
-    textAlign: 'end'
-  },
-  contentRightLabel: {
-    fontSize: '0.75rem',
-    lineHeight: '1.125rem',
-    color: '#52637A',
-    textAlign: 'end'
-  },
-  contentRightValue: {
-    fontSize: '0.75rem',
-    lineHeight: '1.125rem',
-    fontWeight: '600',
-    color: '#14191F',
-    textAlign: 'end',
-    marginLeft: '0.5rem'
-  },
-  contentRightActions: {
-    alignItems: 'flex-end',
-    justifyContent: 'flex-end'
-  },
-  signedBadge: {
-    color: '#9ccc65',
-    height: '1.375rem',
-    width: '1.375rem',
-    marginLeft: 10
-  },
-  vendor: {
-    color: theme.palette.primary.main,
-    fontSize: '0.75rem',
-    maxWidth: '50%',
-    textOverflow: 'ellipsis',
-    lineHeight: '1.125rem'
-  },
-  description: {
-    color: '#52637A',
-    fontSize: '1rem',
-    lineHeight: '1.5rem',
-    textOverflow: 'ellipsis',
-    marginBottom: 0,
-    paddingTop: '1rem'
-  },
-  versionLast: {
-    color: theme.palette.secondary.dark,
-    fontSize: '0.75rem',
-    lineHeight: '1.125rem',
-    textOverflow: 'ellipsis'
-  },
-  cardTitle: {
-    textOverflow: 'ellipsis',
-    maxWidth: '70%',
-    fontWeight: '600',
-    color: '#0F2139',
-    lineHeight: '2rem'
-  },
-  platformChips: {
-    backgroundColor: '#E0E5EB',
-    color: '#52637A',
-    fontSize: '0.813rem',
-    lineHeight: '0.813rem',
-    borderRadius: '0.375rem',
-    padding: '0.313rem 0.625rem'
-  },
-  chipLabel: {
-    padding: '0'
-  }
-}));
-
 function RepoCard(props) {
-  const classes = useStyles();
   const navigate = useNavigate();
   const placeholderImage = useRef(randomImage());
-  // dynamically check device size with mui media query hook
-  const theme = useTheme();
-  const isXsSize = useMediaQuery(theme.breakpoints.down('md'));
-  const MAX_PLATFORM_CHIPS = isXsSize ? 3 : 6;
+  const MAX_PLATFORM_CHIPS = 6;
 
   const abortController = useMemo(() => new AbortController(), []);
 
@@ -208,7 +91,7 @@ function RepoCard(props) {
   };
 
   const handlePlatformChipClick = (event) => {
-    const { textContent } = event.target;
+    const textContent = event.target.textContent;
     event.stopPropagation();
     event.preventDefault();
     navigate({ pathname: `/explore`, search: createSearchParams({ filter: textContent }).toString() });
@@ -247,15 +130,13 @@ function RepoCard(props) {
     const displayedPlatforms = filteredPlatforms.slice(0, MAX_PLATFORM_CHIPS + 1);
     if (hiddenChips > 0) displayedPlatforms.push(`+${hiddenChips} more`);
     return displayedPlatforms.map((platform, index) => (
-      <Chip
+      <button
         key={`${name}${platform}${index}`}
-        label={platform}
         onClick={handlePlatformChipClick}
-        className={classes.platformChips}
-        classes={{
-          label: classes.chipLabel
-        }}
-      />
+        className="bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white text-[11px] font-semibold rounded px-2 py-0.5 border border-slate-700 transition cursor-pointer"
+      >
+        {platform}
+      </button>
     ));
   };
 
@@ -275,13 +156,18 @@ function RepoCard(props) {
   const renderBookmark = () => {
     return (
       isAuthenticated() && (
-        <IconButton component="span" onClick={handleBookmarkClick} data-testid="bookmark-button">
+        <button
+          onClick={handleBookmarkClick}
+          className="p-2 text-slate-400 hover:text-blue-400 hover:bg-slate-800/60 rounded-lg transition duration-150 cursor-pointer focus:outline-none"
+          data-testid="bookmark-button"
+          aria-label="Bookmark repository"
+        >
           {currentBookmarkValue ? (
-            <BookmarkIcon data-testid="bookmarked" />
+            <Bookmark className="w-5 h-5 text-blue-500 fill-blue-500" data-testid="bookmarked" />
           ) : (
-            <BookmarkBorderIcon data-testid="not-bookmarked" />
+            <Bookmark className="w-5 h-5" data-testid="not-bookmarked" />
           )}
-        </IconButton>
+        </button>
       )
     );
   };
@@ -289,123 +175,107 @@ function RepoCard(props) {
   const renderStar = () => {
     return (
       isAuthenticated() && (
-        <IconButton component="span" onClick={handleStarClick} data-testid="star-button">
-          {currentStarValue ? <StarIcon data-testid="starred" /> : <StarBorderIcon data-testid="not-starred" />}
-        </IconButton>
+        <button
+          onClick={handleStarClick}
+          className="p-1.5 text-slate-400 hover:text-amber-500 hover:bg-slate-800/60 rounded-lg transition duration-150 cursor-pointer focus:outline-none"
+          data-testid="star-button"
+          aria-label="Star repository"
+        >
+          {currentStarValue ? (
+            <Star className="w-4 h-4 text-amber-550 fill-amber-500" data-testid="starred" />
+          ) : (
+            <Star className="w-4 h-4" data-testid="not-starred" />
+          )}
+        </button>
       )
     );
   };
 
   const getSignatureChips = () => {
     const cosign = signatureInfo?.map((s) => s.tool).includes(filterConstants.signatureToolConstants.COSIGN)
-      ? signatureInfo.filter((si) => si.tool == filterConstants.signatureToolConstants.COSIGN)
+      ? signatureInfo.filter((si) => si.tool === filterConstants.signatureToolConstants.COSIGN)
       : null;
     const notation = signatureInfo?.map((s) => s.tool).includes(filterConstants.signatureToolConstants.NOTATION)
-      ? signatureInfo.filter((si) => si.tool == filterConstants.signatureToolConstants.NOTATION)
+      ? signatureInfo.filter((si) => si.tool === filterConstants.signatureToolConstants.NOTATION)
       : null;
     const sigArray = [];
     if (cosign) sigArray.push(cosign);
     if (notation) sigArray.push(notation);
     if (sigArray.length === 0) return <SignatureIconCheck />;
     return sigArray.map((sig, index) => (
-      <div className="hide-on-mobile" key={`${name}sig${index}`}>
+      <div className="hidden sm:inline-flex" key={`${name}sig${index}`}>
         <SignatureIconCheck signatureInfo={sig} />
       </div>
     ));
   };
 
   return (
-    <Card variant="outlined" className={classes.card} data-testid="repo-card">
-      <CardActionArea
-        onClick={goToDetails}
-        classes={{
-          root: classes.cardBtn,
-          focusHighlight: classes.focusHighlight
-        }}
-      >
-        <CardContent className={classes.content}>
-          <Grid container>
-            <Grid item xs={12} md={10}>
-              <Stack alignItems="center" direction="row" spacing={2}>
-                <CardMedia
-                  classes={{
-                    root: classes.media,
-                    img: classes.avatar
-                  }}
-                  component="img"
-                  image={placeholderImage.current}
-                  alt="icon"
-                />
-                <Tooltip title={name} placement="top">
-                  <Typography variant="h5" component="div" noWrap className={classes.cardTitle}>
-                    {name}
-                  </Typography>
-                </Tooltip>
-                <div className="hide-on-mobile" style={{ display: 'inline-flex' }}>
-                  <VulnerabilityIconCheck {...vulnerabilityData} className="hide-on-mobile" />
-                </div>
-                {getSignatureChips()}
-              </Stack>
-              <Tooltip title={description || 'Description not available'} placement="top">
-                <Typography className={classes.description} pt={1} sx={{ fontSize: 12 }} gutterBottom noWrap>
-                  {description || 'Description not available'}
-                </Typography>
-              </Tooltip>
-              <Stack alignItems="center" direction="row" spacing={1} pt={1}>
-                {platformChips()}
-              </Stack>
-              <Stack alignItems="center" direction="row" spacing={1} pt={'0.5rem'}>
-                <Tooltip title={getVendor()} placement="top" className="hide-on-mobile">
-                  <Typography className={classes.vendor} variant="body2" noWrap>
-                    {<Markdown options={{ forceInline: true }}>{getVendor()}</Markdown>}
-                  </Typography>
-                </Tooltip>
-                <Tooltip title={getVersion()} placement="top" className="hide-on-mobile">
-                  <Typography className={classes.versionLast} variant="body2" noWrap>
-                    {getVersion()}
-                  </Typography>
-                </Tooltip>
-                <Tooltip title={lastUpdated?.slice(0, 16) || ' '} placement="top">
-                  <Typography className={classes.versionLast} variant="body2" noWrap>
-                    {getLast()}
-                  </Typography>
-                </Tooltip>
-              </Stack>
-            </Grid>
-            <Grid item container xs={2} md={2} className={`hide-on-mobile ${classes.contentRight}`}>
-              <Grid item xs={12}>
-                <Typography variant="body2" component="span" className={classes.contentRightLabel}>
-                  Downloads •
-                </Typography>
-                <Typography variant="body2" component="span" className={classes.contentRightValue}>
-                  {!isNaN(downloads) ? downloads : `not available`}
-                </Typography>
-              </Grid>
-              {/* <Grid item xs={12}>
-                  <Typography variant="body2" component="span" className={classes.contentRightLabel}>
-                    Rating •
-                  </Typography>
-                  <Typography variant="body2" component="span" className={classes.contentRightValue}>
-                    #1
-                  </Typography>
-                </Grid> */}
-              <Grid item xs={12}>
-                {renderStar()}
-                <Typography variant="body2" component="span" className={classes.contentRightLabel}>
-                  Stars •
-                </Typography>
-                <Typography variant="body2" component="span" className={classes.contentRightValue}>
-                  {!isNaN(currentStarCount) ? currentStarCount : `not available`}
-                </Typography>
-              </Grid>
-              <Grid container item xs={12} className={classes.contentRightActions}>
-                <Grid item>{renderBookmark()}</Grid>
-              </Grid>
-            </Grid>
-          </Grid>
-        </CardContent>
-      </CardActionArea>
-    </Card>
+    <div
+      onClick={goToDetails}
+      className="group w-full bg-slate-900 border border-slate-800/80 hover:border-slate-700/80 rounded-xl p-5 hover:bg-slate-900/80 transition-all duration-200 cursor-pointer shadow-lg hover:shadow-indigo-500/2"
+      data-testid="repo-card"
+    >
+      <div className="flex flex-row justify-between items-start gap-4">
+        {/* Left Side: Avatar, Title, Description, Platforms & Meta */}
+        <div className="flex-1 min-w-0">
+          {/* Header row: Avatar, title, bug icon, signatures */}
+          <div className="flex items-center gap-3 mb-2 flex-wrap sm:flex-nowrap">
+            <img
+              src={placeholderImage.current}
+              alt="icon"
+              className="w-6 h-6 object-contain rounded"
+            />
+            <Tooltip title={name}>
+              <h3 className="text-lg font-bold text-white tracking-tight group-hover:text-blue-400 transition-colors duration-150 truncate max-w-sm sm:max-w-md md:max-w-lg">
+                {name}
+              </h3>
+            </Tooltip>
+            <div className="hidden sm:flex items-center gap-2">
+              <VulnerabilityIconCheck {...vulnerabilityData} />
+              {getSignatureChips()}
+            </div>
+          </div>
+
+          {/* Description */}
+          <Tooltip title={description || 'Description not available'} className="flex w-full text-left justify-start">
+            <p className="text-sm text-slate-400 mb-4 line-clamp-2 max-w-3xl text-left w-full">
+              {description || 'Description not available'}
+            </p>
+          </Tooltip>
+
+          {/* Platform tags */}
+          <div className="flex flex-wrap items-center gap-1.5 mb-3.5">
+            {platformChips()}
+          </div>
+
+          {/* Meta text: vendor, version, last updated */}
+          <div className="flex flex-wrap items-center gap-1.5 text-xs text-slate-500 text-left">
+            <span className="hidden sm:inline">
+              <Markdown options={{ forceInline: true }}>{getVendor()}</Markdown>
+            </span>
+            <span className="hidden sm:inline">{getVersion()}</span>
+            <span>{getLast()}</span>
+          </div>
+        </div>
+
+        {/* Right Side: Downloads & Stars & Bookmark action */}
+        <div className="flex flex-col items-end justify-between self-stretch shrink-0 text-right">
+          <div className="space-y-1.5 hidden sm:block">
+            <div className="text-xs text-slate-500">
+              Downloads: <span className="font-semibold text-slate-300 ml-1">{!isNaN(downloads) ? downloads : 'N/A'}</span>
+            </div>
+            <div className="flex items-center gap-1 text-xs text-slate-500 justify-end">
+              {renderStar()}
+              <span>Stars:</span>
+              <span className="font-semibold text-slate-300 ml-1">{!isNaN(currentStarCount) ? currentStarCount : 'N/A'}</span>
+            </div>
+          </div>
+          <div className="mt-auto">
+            {renderBookmark()}
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
 

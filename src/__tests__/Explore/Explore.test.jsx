@@ -345,16 +345,23 @@ describe('Explore component', () => {
     const allUntrustedSignaturesIcons = await screen.findAllByTestId('untrusted-icon');
     fireEvent.mouseOver(allUntrustedSignaturesIcons[0]);
     expect(await screen.findByText('Signed-by: Unknown')).toBeInTheDocument();
+    fireEvent.mouseLeave(allUntrustedSignaturesIcons[0]);
+
     const allTrustedSignaturesIcons = await screen.findAllByTestId('verified-icon');
     fireEvent.mouseOver(allTrustedSignaturesIcons[8]);
     expect(await screen.findByText('Tool: cosign')).toBeInTheDocument();
     expect(await screen.findByText('Signed-by: author1')).toBeInTheDocument();
+    fireEvent.mouseLeave(allTrustedSignaturesIcons[8]);
+
     fireEvent.mouseOver(allTrustedSignaturesIcons[9]);
     expect(await screen.findByText('Tool: notation')).toBeInTheDocument();
     expect(await screen.findByText('Signed-by: author2')).toBeInTheDocument();
+    fireEvent.mouseLeave(allTrustedSignaturesIcons[9]);
+
     const allNoSignedIcons = await screen.findAllByTestId('unverified-icon');
     fireEvent.mouseOver(allNoSignedIcons[0]);
     expect(await screen.findByText('Not signed')).toBeInTheDocument();
+    fireEvent.mouseLeave(allNoSignedIcons[0]);
   });
 
   it('renders vulnerability icons', async () => {

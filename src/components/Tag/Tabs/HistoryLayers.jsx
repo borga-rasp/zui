@@ -1,27 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react';
-
-// components
-import { Stack, Typography } from '@mui/material';
 import LayerCard from '../../Shared/LayerCard.jsx';
-import makeStyles from '@mui/styles/makeStyles';
 import Loading from '../../Shared/Loading';
 
-const useStyles = makeStyles(() => ({
-  title: {
-    marginBottom: '1.7rem',
-    color: 'rgba(0, 0, 0, 0.87)',
-    fontSize: '1.5rem',
-    fontWeight: '600'
-  },
-  none: {
-    color: '#52637A',
-    fontSize: '1.4rem',
-    fontWeight: '600'
-  }
-}));
-
 function HistoryLayers(props) {
-  const classes = useStyles();
   const [historyData, setHistoryData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const abortController = useMemo(() => new AbortController(), []);
@@ -36,14 +17,15 @@ function HistoryLayers(props) {
   }, [name, history]);
 
   return (
-    <>
-      <Typography variant="h4" gutterBottom component="div" align="left" className={classes.title}>
+    <div className="flex flex-col gap-4 text-left">
+      <h2 className="text-xl font-bold text-white tracking-tight border-b border-slate-800 pb-3 mb-2">
         Layers
-      </Typography>
+      </h2>
+      
       {isLoading ? (
         <Loading />
       ) : (
-        <Stack direction="column" spacing={2} sx={{ marginTop: '1.7rem' }} data-testid="layer-card-container">
+        <div className="flex flex-col gap-3" data-testid="layer-card-container">
           {historyData?.length > 0 ? (
             historyData.map((layer, index) => {
               return (
@@ -56,13 +38,13 @@ function HistoryLayers(props) {
               );
             })
           ) : (
-            <div>
-              <Typography className={classes.none}> No Layer data available </Typography>
+            <div className="text-slate-400 font-medium py-6 text-center">
+              No Layer data available
             </div>
           )}
-        </Stack>
+        </div>
       )}
-    </>
+    </div>
   );
 }
 

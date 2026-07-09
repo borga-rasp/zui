@@ -9,20 +9,6 @@ import filterConstants from 'utilities/filterConstants';
 import { isEmpty, head, uniqBy } from 'lodash';
 
 // components
-import {
-  Card,
-  CardContent,
-  CardMedia,
-  Grid,
-  FormControl,
-  Stack,
-  Select,
-  MenuItem,
-  ToggleButtonGroup,
-  ToggleButton,
-  Typography,
-  InputLabel
-} from '@mui/material';
 import TagDetailsMetadata from './TagDetailsMetadata';
 import VulnerabilitiesDetails from './Tabs/VulnerabilitiesDetails';
 import HistoryLayers from './Tabs/HistoryLayers';
@@ -31,7 +17,6 @@ import IsDependentOn from './Tabs/IsDependentOn';
 import Loading from '../Shared/Loading';
 import { VulnerabilityIconCheck, SignatureIconCheck } from 'utilities/vulnerabilityAndSignatureCheck';
 import ReferredBy from './Tabs/ReferredBy';
-import makeStyles from '@mui/styles/makeStyles';
 
 // placeholder images
 import repocube1 from '../../assets/repocube-1.png';
@@ -39,91 +24,27 @@ import repocube2 from '../../assets/repocube-2.png';
 import repocube3 from '../../assets/repocube-3.png';
 import repocube4 from '../../assets/repocube-4.png';
 
-const useStyles = makeStyles((theme) => ({
-  pageWrapper: {
-    backgroundColor: 'transparent',
-    display: 'flex',
-    marginBottom: '3%'
-  },
-  repoName: {
-    fontWeight: '600',
-    fontSize: '1.5rem',
-    color: theme.palette.secondary.main,
-    textAlign: 'left'
-  },
-  avatar: {
-    height: '1.438rem',
-    width: '1.438rem',
-    objectFit: 'fill'
-  },
-  digest: {
-    textAlign: 'left',
-    fontSize: '1rem',
-    lineHeight: '1.5rem',
-    color: '#52637A',
-    maxWidth: '100%',
-    [theme.breakpoints.down('md')]: {
-      padding: '0.5rem 0 0 0',
-      fontSize: '0.5rem'
-    }
-  },
-  media: {
-    borderRadius: '3.125em'
-  },
-  tabsContainer: {
-    display: 'flex',
-    justifyContent: 'flex-start',
-    margin: '1.625rem 0'
-  },
-  tabs: {
-    borderRadius: '0.375rem'
-  },
-  tabsButtons: {
-    backgroundColor: '#F6F7F9',
-    color: '#656C75',
-    border: '2px solid #E0E5EB',
-    borderRadius: '0.375rem',
-    padding: '0.313rem 0.75rem',
-    textTransform: 'none',
-    fontWeight: '700',
-    fontSize: '0.875rem',
-    marginLeft: '0!important',
-    '&.Mui-selected': {
-      backgroundColor: 'rgba(15, 33, 57, 0.05)',
-      color: theme.palette.secondary.main,
-      border: '2px solid #0F2139!important'
-    }
-  },
-  tabContent: {
-    height: '100%',
-    [theme.breakpoints.down('md')]: {
-      padding: '0'
-    }
-  },
-  metadata: {
-    paddingLeft: '1.25rem',
-    [theme.breakpoints.down('md')]: {
-      marginTop: '1rem',
-      paddingLeft: '0'
-    }
-  },
-  cardContent: {
-    paddingBottom: '1rem'
-  },
-  tabCardContent: {
-    padding: '1.5rem'
-  },
-  cardRoot: {
-    boxShadow: 'none!important',
-    borderRadius: '0.75rem'
-  },
-  header: {
-    letterSpacing: '-0.01rem',
-    [theme.breakpoints.down('md')]: {
-      padding: '0'
-    }
-  }
-}));
+// Custom Tooltip component in pure Tailwind CSS
+const Tooltip = ({ title, children }) => {
+  const [show, setShow] = useState(false);
+  return (
+    <div 
+      className="group relative inline-flex items-center"
+      onMouseEnter={() => setShow(true)}
+      onMouseLeave={() => setShow(false)}
+    >
+      {children}
+      {title && show && (
+        <div className="absolute bottom-full left-1/2 z-[2000] mb-2 -translate-x-1/2 select-none pointer-events-none">
+          <div className="bg-slate-900 border border-slate-800 text-slate-100 text-xs rounded-lg px-2.5 py-1.5 shadow-xl max-w-xs whitespace-normal text-left">
+            {title}
+          </div>
+          <div className="w-2.5 h-2.5 bg-slate-900 border-r border-b border-slate-800 rotate-45 absolute -bottom-1.5 left-1/2 -translate-x-1/2" />
+        </div>
+      )}
+    </div>
+  );
+};
 
 // temporary utility to get image
 const randomIntFromInterval = (min, max) => {
@@ -151,10 +72,7 @@ function TagDetails() {
   // get url param from <Route here (i.e. image name)
   const { reponame, tag } = useParams();
 
-  const classes = useStyles();
-
   useEffect(() => {
-    // if same-page navigation because of tag update, following 2 lines help ux
     setSelectedTab('Layers');
     window?.scrollTo(0, 0);
     setIsLoading(true);
@@ -194,13 +112,12 @@ function TagDetails() {
     return selectedManifest?.platform ? selectedManifest.platform : '--/--';
   };
 
-  const handleTabChange = (event, newValue) => {
-    if (newValue) setSelectedTab(newValue);
-  };
-
   const handleOSArchChange = (e) => {
     const { value } = e.target;
-    setSelectedManifest(value);
+    const manifest = imageDetailData?.manifests?.find((m) => m.digest === value);
+    if (manifest) {
+      setSelectedManifest(manifest);
+    }
   };
 
   const renderTabContent = () => {
@@ -223,7 +140,6 @@ function TagDetails() {
           [...(selectedManifest?.referrers || []), ...(imageDetailData?.referrers || [])],
           'digest'
         );
-
         return <ReferredBy referrers={allReferrers} />;
       default:
         return <HistoryLayers name={imageDetailData?.name} history={selectedManifest?.history || []} />;
@@ -234,19 +150,19 @@ function TagDetails() {
     const cosign = imageDetailData?.signatureInfo
       ?.map((s) => s.tool)
       ?.includes(filterConstants.signatureToolConstants.COSIGN)
-      ? imageDetailData?.signatureInfo?.filter((si) => si.tool == filterConstants.signatureToolConstants.COSIGN)
+      ? imageDetailData?.signatureInfo?.filter((si) => si.tool === filterConstants.signatureToolConstants.COSIGN)
       : null;
     const notation = imageDetailData?.signatureInfo
       ?.map((s) => s.tool)
       ?.includes(filterConstants.signatureToolConstants.NOTATION)
-      ? imageDetailData?.signatureInfo?.filter((si) => si.tool == filterConstants.signatureToolConstants.NOTATION)
+      ? imageDetailData?.signatureInfo?.filter((si) => si.tool === filterConstants.signatureToolConstants.NOTATION)
       : null;
     const sigArray = [];
     if (cosign) sigArray.push(cosign);
     if (notation) sigArray.push(notation);
     if (sigArray.length === 0) return <SignatureIconCheck />;
     return sigArray.map((sig, index) => (
-      <div className="hide-on-mobile" key={`${imageDetailData?.name || ''}sig${index}`}>
+      <div className="hidden sm:inline-flex" key={`${imageDetailData?.name || ''}sig${index}`}>
         <SignatureIconCheck signatureInfo={sig} />
       </div>
     ));
@@ -257,121 +173,100 @@ function TagDetails() {
       {isLoading ? (
         <Loading />
       ) : (
-        <Grid container className={classes.pageWrapper}>
-          <Grid item xs={12} md={12}>
-            <Card className={classes.cardRoot}>
-              <CardContent className={classes.cardContent}>
-                <Grid container>
-                  <Grid item xs={12} md={9} className={classes.header}>
-                    <Stack
-                      alignItems="center"
-                      sx={{ width: { xs: '100%', md: 'auto' }, marginBottom: '1rem' }}
-                      direction={{ xs: 'column', md: 'row' }}
-                      spacing={1}
-                    >
-                      <Stack alignItems="center" sx={{ width: { xs: '100%', md: 'auto' } }} direction="row" spacing={1}>
-                        <CardMedia
-                          classes={{
-                            root: classes.media,
-                            img: classes.avatar
-                          }}
-                          component="img"
-                          image={placeholderImage.current}
-                          alt="icon"
-                        />
-                        <Typography variant="h4" className={classes.repoName}>
-                          <span className="hide-on-mobile">{reponame}</span>:{tag}
-                        </Typography>
-                      </Stack>
+        <div className="w-full flex flex-col gap-6 text-left" data-testid="tag-container">
+          {/* Main Info Card */}
+          <div className="MuiCard-root bg-[#111827] border border-slate-800/80 rounded-2xl p-6 md:p-8 shadow-xl flex flex-col gap-4">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div className="flex items-center gap-4">
+                <img
+                  src={placeholderImage.current}
+                  alt="icon"
+                  className="w-8 h-8 object-contain rounded"
+                />
+                <h1 className="text-3xl font-extrabold text-white tracking-tight">
+                  <span className="hidden sm:inline">{reponame}</span>:{tag}
+                </h1>
+              </div>
 
-                      <Stack alignItems="center" sx={{ width: { xs: '100%', md: 'auto' } }} direction="row" spacing={2}>
-                        <VulnerabilityIconCheck
-                          vulnerabilitySeverity={imageDetailData?.vulnerabiltySeverity}
-                          count={imageDetailData?.vulnerabilityCount}
-                        />
-                        {getSignatureChips()}
-                      </Stack>
-                    </Stack>
-                    {imageDetailData?.manifests && imageDetailData.manifests.length > 0 && (
-                      <Stack direction="row" alignItems="center" spacing="1rem">
-                        <FormControl sx={{ m: '1', minWidth: '4.6875rem' }} className={classes.sortForm} size="small">
-                          <InputLabel>OS/Arch</InputLabel>
-                          {!isEmpty(selectedManifest) && (
-                            <Select
-                              label="OS/Arch"
-                              value={selectedManifest}
-                              onChange={handleOSArchChange}
-                              MenuProps={{ disableScrollLock: true }}
-                            >
-                              {imageDetailData?.manifests?.map((el) => (
-                                <MenuItem key={el.digest} value={el}>
-                                  {`${el.platform?.Os || '----'}/${el.platform?.Arch || '----'}`}
-                                </MenuItem>
-                              ))}
-                            </Select>
-                          )}
-                        </FormControl>
-                        <Typography gutterBottom className={classes.digest}>
-                          Digest: {selectedManifest?.digest}
-                        </Typography>
-                      </Stack>
-                    )}
-                  </Grid>
-                </Grid>
-              </CardContent>
-            </Card>
-          </Grid>
-          <Grid item xs={12} md={12} className={classes.tabsContainer}>
-            <ToggleButtonGroup
-              color="primary"
-              classes={{
-                root: classes.tabs,
-                grouped: classes.tabsButtons
-              }}
-              value={selectedTab}
-              exclusive
-              onChange={handleTabChange}
-              aria-label="Tabs"
-              disabled={isLoading}
-            >
-              <ToggleButton value="Layers" role="tab">
-                Layers
-              </ToggleButton>
-              <ToggleButton value="DependsOn" role="tab" data-testid="dependencies-tab">
-                Uses
-              </ToggleButton>
-              <ToggleButton value="IsDependentOn" role="tab">
-                Used by
-              </ToggleButton>
-              <ToggleButton value="Vulnerabilities" role="tab">
-                Vulnerabilities
-              </ToggleButton>
-              <ToggleButton value="ReferredBy" role="tab">
-                Referred by
-              </ToggleButton>
-            </ToggleButtonGroup>
-          </Grid>
-          <Grid item xs={12} md={8}>
-            <Card className={classes.cardRoot}>
-              <CardContent
-                key={`card_content_manifest_key_${selectedManifest?.digest}`}
-                className={classes.tabCardContent}
+              <div className="flex items-center gap-3">
+                <VulnerabilityIconCheck
+                  vulnerabilitySeverity={imageDetailData?.vulnerabiltySeverity}
+                  count={imageDetailData?.vulnerabilityCount}
+                />
+                {getSignatureChips()}
+              </div>
+            </div>
+
+            {/* OS/Arch and Digest */}
+            {imageDetailData?.manifests && imageDetailData.manifests.length > 0 && (
+              <div className="flex flex-col sm:flex-row sm:items-center gap-4 pt-4 border-t border-slate-800/40">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-semibold text-slate-400">OS/Arch</span>
+                  <select
+                    value={selectedManifest?.digest}
+                    onChange={handleOSArchChange}
+                    className="bg-slate-900 border border-slate-800 rounded-lg py-1.5 px-3 text-sm text-slate-200 focus:outline-none focus:border-blue-500 cursor-pointer"
+                  >
+                    {imageDetailData?.manifests?.map((el) => (
+                      <option key={el.digest} value={el.digest}>
+                        {`${el.platform?.Os || '----'}/${el.platform?.Arch || '----'}`}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <span className="text-xs text-slate-500 truncate">
+                  Digest: {selectedManifest?.digest}
+                </span>
+              </div>
+            )}
+          </div>
+
+          {/* Toggle buttons for tabs */}
+          <div className="flex border border-slate-800/80 bg-slate-900/60 rounded-xl p-1 self-start" role="tablist">
+            {[
+              { value: 'Layers', label: 'Layers' },
+              { value: 'DependsOn', label: 'Uses', testId: 'dependencies-tab' },
+              { value: 'IsDependentOn', label: 'Used by' },
+              { value: 'Vulnerabilities', label: 'Vulnerabilities' },
+              { value: 'ReferredBy', label: 'Referred by' }
+            ].map((tab) => (
+              <button
+                key={tab.value}
+                role="tab"
+                data-testid={tab.testId}
+                aria-selected={selectedTab === tab.value}
+                onClick={() => setSelectedTab(tab.value)}
+                className={`px-4 py-2.5 text-xs font-bold rounded-lg transition duration-150 cursor-pointer focus:outline-none ${
+                  selectedTab === tab.value
+                    ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md'
+                    : 'text-slate-400 hover:text-slate-200'
+                }`}
               >
-                {renderTabContent()}
-              </CardContent>
-            </Card>
-          </Grid>
-          <Grid item xs={12} md={4} className={classes.metadata}>
-            <TagDetailsMetadata
-              platform={getPlatform()}
-              size={selectedManifest?.size}
-              lastUpdated={selectedManifest?.lastUpdated}
-              lastTagged={imageDetailData?.lastTagged}
-              license={imageDetailData?.license}
-              imageName={imageDetailData?.name}
-            />
-          </Grid>
-        </Grid>
+                {tab.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Main layout: Tab Content (left) and Metadata (right) */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
+            {/* Tab content */}
+            <div className="MuiCard-root md:col-span-2 bg-[#111827] border border-slate-800/80 rounded-2xl p-6 shadow-xl">
+              {renderTabContent()}
+            </div>
+
+            {/* Metadata column */}
+            <div className="md:col-span-1">
+              <TagDetailsMetadata
+                platform={getPlatform()}
+                size={selectedManifest?.size}
+                lastUpdated={selectedManifest?.lastUpdated}
+                lastTagged={imageDetailData?.lastTagged}
+                license={imageDetailData?.license}
+                imageName={imageDetailData?.name}
+              />
+            </div>
+          </div>
+        </div>
       )}
     </>
   );

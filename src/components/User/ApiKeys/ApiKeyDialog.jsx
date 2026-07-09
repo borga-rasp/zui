@@ -1,57 +1,15 @@
 import React, { useState } from 'react';
-
 import { isNil, isNumber } from 'lodash';
 import { DateTime } from 'luxon';
 import { api, endpoints } from 'api';
 import { host } from 'host';
 
-import {
-  Dialog,
-  DialogContent,
-  TextField,
-  DialogTitle,
-  DialogActions,
-  Button,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  Typography,
-  Grid
-} from '@mui/material';
-import { DatePicker } from '@mui/x-date-pickers';
-
-import { makeStyles } from '@mui/styles';
-
-const useStyles = makeStyles(() => ({
-  gridWrapper: {
-    paddingTop: '2rem',
-    paddingBottom: '2rem'
-  },
-  apiKeyLabel: {
-    paddingBottom: '1rem'
-  },
-  expirationDateContainer: {
-    width: '100%'
-  },
-  expirationDateInput: {
-    width: '100%'
-  },
-  expirationDateDisplay: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center'
-  }
-}));
-
 function ApiKeyDialog(props) {
   const { open, setOpen, onConfirm } = props;
 
-  const [apiKeyLabel, setApiKeyLabel] = useState();
+  const [apiKeyLabel, setApiKeyLabel] = useState('');
   const [expirationDateOffset, setExpirationDateOffset] = useState(30);
-  const [selectedExpirationDate, setSelectedExpirationDate] = useState();
-
-  const classes = useStyles();
+  const [selectedExpirationDate, setSelectedExpirationDate] = useState('');
 
   const handleClose = () => {
     setOpen(false);
@@ -81,11 +39,11 @@ function ApiKeyDialog(props) {
 
   const handleExpirationDateChange = (e) => {
     const { value } = e.target;
-    setExpirationDateOffset(value);
+    setExpirationDateOffset(value === 'custom' ? 'custom' : Number(value));
   };
 
-  const handleDatePickerChange = (newValue) => {
-    setSelectedExpirationDate(newValue);
+  const handleDatePickerChange = (e) => {
+    setSelectedExpirationDate(e.target.value);
   };
 
   const getExpirationDatetime = () => {
@@ -99,73 +57,91 @@ function ApiKeyDialog(props) {
 
   const getExpirationDisplay = () => {
     const expDateTime = getExpirationDatetime();
+    if (!expDateTime) return '';
     return `Expires on ${expDateTime.toLocaleString(DateTime.DATE_MED_WITH_WEEKDAY)}`;
   };
 
+  if (!open) return null;
+
   return (
-    <Dialog open={open} onClose={handleClose}>
-      <DialogTitle>Create Api Key</DialogTitle>
-      <DialogContent className={classes.apiKeyForm}>
-        <Grid container className={classes.gridWrapper}>
-          <Grid item container className={classes.apiKeyLabel} xs={12}>
-            <TextField
+    <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4 bg-slate-950/75 backdrop-blur-sm animate-in fade-in duration-200">
+      <div className="w-full max-w-md bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-2xl animate-in zoom-in-95 duration-200 text-left flex flex-col gap-5">
+        <h3 className="text-lg font-bold text-white">
+          Create Api Key
+        </h3>
+        
+        <div className="flex flex-col gap-4">
+          {/* Label Input */}
+          <div className="flex flex-col gap-1.5">
+            <label className="block text-sm font-semibold text-slate-350" htmlFor="apikeylabel">
+              Label
+            </label>
+            <input
               autoFocus
               required
               id="apikeylabel"
-              label="Label"
-              fullWidth
-              variant="outlined"
+              type="text"
+              placeholder="Enter key label"
               onChange={handleLabelChange}
+              className="w-full bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-blue-500 rounded-lg py-2.5 px-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition duration-150"
             />
-          </Grid>
-          <Grid container item xs={12}>
-            <Grid item xs={5}>
-              <FormControl className={classes.expirationDateContainer} size="small" required>
-                <InputLabel disableAnimation>Expiration date</InputLabel>
-                <Select
-                  labelId="expirationDate"
-                  id="expirationDate"
-                  label="Expiration time"
-                  onChange={handleExpirationDateChange}
-                  value={expirationDateOffset}
-                  className={classes.expirationDateInput}
-                >
-                  <MenuItem value={7}>7 days</MenuItem>
-                  <MenuItem value={30}>30 days</MenuItem>
-                  <MenuItem value={60}>60 days</MenuItem>
-                  <MenuItem value={90}>90 days</MenuItem>
-                  <MenuItem value="custom">custom</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid item className={classes.expirationDateDisplay} xs={7}>
+          </div>
+
+          {/* Expiration Settings */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-end mt-1">
+            <div className="flex flex-col gap-1.5">
+              <label className="block text-sm font-semibold text-slate-350" htmlFor="expirationDate">
+                Expiration date
+              </label>
+              <select
+                id="expirationDate"
+                value={expirationDateOffset}
+                onChange={handleExpirationDateChange}
+                className="w-full bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-blue-500 rounded-lg py-2.5 px-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition duration-150 cursor-pointer"
+              >
+                <option value={7}>7 days</option>
+                <option value={30}>30 days</option>
+                <option value={60}>60 days</option>
+                <option value={90}>90 days</option>
+                <option value="custom">custom</option>
+              </select>
+            </div>
+
+            <div className="flex items-center justify-start h-10">
               {expirationDateOffset === 'custom' ? (
-                <DatePicker
-                  valueType="date"
-                  slotProps={{ textField: { size: 'small' } }}
+                <input
+                  type="date"
+                  value={selectedExpirationDate}
                   onChange={handleDatePickerChange}
+                  className="w-full bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-blue-500 rounded-lg py-2 px-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition duration-150 cursor-pointer"
                 />
               ) : (
-                <Typography>{getExpirationDisplay()}</Typography>
+                <span className="text-xs font-semibold text-slate-450 truncate">
+                  {getExpirationDisplay()}
+                </span>
               )}
-            </Grid>
-          </Grid>
-        </Grid>
-      </DialogContent>
-      <DialogActions>
-        <Button
-          variant="contained"
-          color="success"
-          onClick={handleSubmit}
-          disabled={expirationDateOffset === 'custom' && isNil(selectedExpirationDate)}
-        >
-          Create
-        </Button>
-        <Button variant="outlined" onClick={handleClose}>
-          Cancel
-        </Button>
-      </DialogActions>
-    </Dialog>
+            </div>
+          </div>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex items-center justify-end gap-3 mt-4">
+          <button
+            onClick={handleClose}
+            className="bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold py-2.5 px-5 rounded-lg transition cursor-pointer focus:outline-none"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={handleSubmit}
+            disabled={expirationDateOffset === 'custom' && isEmpty(selectedExpirationDate)}
+            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 px-5 rounded-lg transition disabled:opacity-50 cursor-pointer focus:outline-none"
+          >
+            Create
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }
 

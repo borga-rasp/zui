@@ -4,152 +4,25 @@ import React, { useEffect, useMemo, useState, useRef } from 'react';
 import { api, endpoints } from '../../../api';
 
 // components
-import {
-  IconButton,
-  Stack,
-  Typography,
-  InputBase,
-  ToggleButton,
-  Menu,
-  MenuItem,
-  Divider,
-  Snackbar,
-  CircularProgress
-} from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
 import { host } from '../../../host';
 import { debounce, isEmpty } from 'lodash';
 import Loading from '../../Shared/Loading';
 import { mapCVEInfo, mapAllCVEInfo } from 'utilities/objectModels';
 import { EXPLORE_PAGE_SIZE } from 'utilities/paginationConstants';
-import SearchIcon from '@mui/icons-material/Search';
-import DownloadIcon from '@mui/icons-material/Download';
+import { Download, List, LayoutList, Search, ChevronRight, ChevronDown, Loader2 } from 'lucide-react';
 
 import * as XLSX from 'xlsx';
 import exportFromJSON from 'export-from-json';
-import ViewHeadlineIcon from '@mui/icons-material/ViewHeadline';
-import ViewAgendaIcon from '@mui/icons-material/ViewAgenda';
-
-import { KeyboardArrowDown, KeyboardArrowRight } from '@mui/icons-material';
-import Collapse from '@mui/material/Collapse';
 
 import VulnerabilitiyCard from '../../Shared/VulnerabilityCard';
 import VulnerabilityCountCard from '../../Shared/VulnerabilityCountCard';
 
-const useStyles = makeStyles((theme) => ({
-  searchAndDisplayBar: {
-    display: 'flex',
-    justifyContent: 'space-between'
-  },
-  title: {
-    color: theme.palette.primary.main,
-    fontSize: '1.5rem',
-    fontWeight: '600',
-    marginBottom: '0'
-  },
-  cveCountSummary: {
-    color: theme.palette.primary.main,
-    fontSize: '1.5rem',
-    fontWeight: '600',
-    marginBottom: '0'
-  },
-  cveId: {
-    color: theme.palette.primary.main,
-    fontSize: '1rem',
-    fontWeight: 400,
-    textDecoration: 'underline'
-  },
-  cveSummary: {
-    color: theme.palette.secondary.dark,
-    fontSize: '0.75rem',
-    fontWeight: '600',
-    textOverflow: 'ellipsis',
-    marginTop: '0.5rem'
-  },
-  none: {
-    color: '#52637A',
-    fontSize: '1.4rem',
-    fontWeight: '600'
-  },
-  vulnerabilities: {
-    position: 'relative',
-    maxWidth: '100%',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between'
-  },
-  search: {
-    position: 'relative',
-    maxWidth: '100%',
-    flex: 0.95,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    boxShadow: 'none',
-    border: '0.063rem solid #E7E7E7',
-    borderRadius: '0.625rem'
-  },
-  expandableSearchInput: {
-    flexGrow: 0.95
-  },
-  view: {
-    alignContent: 'right',
-    variant: 'outlined'
-  },
-  viewModes: {
-    position: 'relative',
-    alignItems: 'baseline',
-    maxWidth: '100%',
-    flexDirection: 'row',
-    justifyContent: 'right'
-  },
-  searchIcon: {
-    color: '#52637A',
-    paddingRight: '3%'
-  },
-  searchInputBase: {
-    width: '90%',
-    paddingLeft: '1.5rem',
-    height: 40,
-    color: 'rgba(0, 0, 0, 0.6)'
-  },
-  input: {
-    color: '#464141',
-    '&::placeholder': {
-      opacity: '1'
-    }
-  },
-  popper: {
-    width: '100%',
-    overflow: 'hidden',
-    padding: '0.3rem',
-    display: 'flex',
-    justifyContent: 'left'
-  },
-  dropdownArrowBox: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center'
-  },
-  dropdownText: {
-    color: '#1479FF',
-    fontSize: '1.5rem',
-    fontWeight: '600',
-    cursor: 'pointer',
-    textAlign: 'center'
-  },
-  test: {
-    width: '95%'
-  }
-}));
-
 function VulnerabilitiesDetails(props) {
-  const classes = useStyles();
   const [cveData, setCveData] = useState([]);
   const [allCveData, setAllCveData] = useState([]);
   const [cveSummary, setCVESummary] = useState({});
   const [isLoading, setIsLoading] = useState(true);
-  const [isLoadingAllCve, setIsLoadingAllCve] = useState(true);
+  const [isLoadingAllCve, setIsLoadingAllCve] = useState(false);
   const abortController = useMemo(() => new AbortController(), []);
   const { name, tag, digest, platform } = props;
 
@@ -163,8 +36,8 @@ function VulnerabilitiesDetails(props) {
   const [isEndOfList, setIsEndOfList] = useState(false);
   const listBottom = useRef(null);
 
-  const [anchorExport, setAnchorExport] = useState(null);
-  const openExport = Boolean(anchorExport);
+  const [isExportMenuOpen, setIsExportMenuOpen] = useState(false);
+  const exportMenuRef = useRef(null);
 
   const [selectedViewMore, setSelectedViewMore] = useState(false);
 
@@ -219,6 +92,7 @@ function VulnerabilitiesDetails(props) {
   };
 
   const getAllCVEs = () => {
+    setIsLoadingAllCve(true);
     api
       .get(`${host()}${endpoints.allVulnerabilitiesForRepo(getCVERequestName())}`, abortController.signal)
       .then((response) => {
@@ -251,10 +125,8 @@ function VulnerabilitiesDetails(props) {
       ws = XLSX.utils.json_to_sheet(allCveData);
 
     XLSX.utils.book_append_sheet(wb, ws, 'vulnerabilities');
-
     XLSX.writeFile(wb, `${name}:${tag}-vulnerabilities.xlsx`);
-
-    handleCloseExport();
+    setIsExportMenuOpen(false);
   };
 
   const handleOnExportCSV = () => {
@@ -262,25 +134,12 @@ function VulnerabilitiesDetails(props) {
     const exportType = exportFromJSON.types.csv;
 
     exportFromJSON({ data: allCveData, fileName, exportType });
-
-    handleCloseExport();
+    setIsExportMenuOpen(false);
   };
 
   const handleCveFilterChange = (e) => {
     const { value } = e.target;
     setCveFilter(value);
-  };
-
-  const handleClickExport = (event) => {
-    setAnchorExport(event.currentTarget);
-  };
-
-  const handleCloseExport = () => {
-    setAnchorExport(null);
-  };
-
-  const handleExpandCVESearch = () => {
-    setOpenExcludeSearch((openExcludeSearch) => !openExcludeSearch);
   };
 
   const handleCveExcludeFilterChange = (e) => {
@@ -295,7 +154,7 @@ function VulnerabilitiesDetails(props) {
     getPaginatedCVEs();
   }, [pageNumber]);
 
-  // setup intersection obeserver for infinite scroll
+  // setup intersection observer for infinite scroll
   useEffect(() => {
     if (isLoading || isEndOfList) return;
     const handleIntersection = (entries) => {
@@ -326,7 +185,15 @@ function VulnerabilitiesDetails(props) {
   }, [cveFilter, cveExcludeFilter, cveSeverityFilter]);
 
   useEffect(() => {
+    function handleClickOutside(event) {
+      if (exportMenuRef.current && !exportMenuRef.current.contains(event.target)) {
+        setIsExportMenuOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+
     return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
       abortController.abort();
       debouncedChangeHandler.cancel();
       debouncedExcludeFilterChangeHandler.cancel();
@@ -334,10 +201,10 @@ function VulnerabilitiesDetails(props) {
   }, []);
 
   useEffect(() => {
-    if (openExport && isEmpty(allCveData)) {
+    if (isExportMenuOpen && isEmpty(allCveData)) {
       getAllCVEs();
     }
-  }, [openExport]);
+  }, [isExportMenuOpen]);
 
   const renderCVEs = () => {
     return !isEmpty(cveData) ? (
@@ -345,7 +212,7 @@ function VulnerabilitiesDetails(props) {
         return <VulnerabilitiyCard key={index} cve={cve} name={name} platform={platform} expand={selectedViewMore} />;
       })
     ) : (
-      <div>{!isLoading && <Typography className={classes.none}> No Vulnerabilities </Typography>}</div>
+      <div>{!isLoading && <div className="text-slate-400 font-medium py-6 text-center"> No Vulnerabilities </div>}</div>
     );
   };
 
@@ -353,7 +220,6 @@ function VulnerabilitiesDetails(props) {
     if (cveSummary === undefined) {
       return;
     }
-
     return !isEmpty(cveSummary) ? (
       <VulnerabilityCountCard
         total={cveSummary.Count}
@@ -364,9 +230,7 @@ function VulnerabilitiesDetails(props) {
         unknown={cveSummary.UnknownCount}
         filterBySeverity={setCveSeverityFilter}
       />
-    ) : (
-      <></>
-    );
+    ) : null;
   };
 
   const renderListBottom = () => {
@@ -374,120 +238,141 @@ function VulnerabilitiesDetails(props) {
       return <Loading />;
     }
     if (!isLoading && !isEndOfList) {
-      return <div ref={listBottom} />;
+      return <div ref={listBottom} className="h-4" />;
     }
-    return;
+    return null;
   };
 
   return (
-    <Stack direction="column" spacing="1rem" data-testid="vulnerability-container">
-      <Stack className={classes.vulnerabilities}>
-        <Typography variant="h4" gutterBottom component="div" align="left" className={classes.title}>
+    <div className="flex flex-col gap-4 text-left" data-testid="vulnerability-container">
+      {/* Header bar */}
+      <div className="flex items-center justify-between border-b border-slate-800 pb-3 mb-2 flex-wrap sm:flex-nowrap gap-4">
+        <h2 className="text-xl font-bold text-white tracking-tight">
           Vulnerabilities
-        </Typography>
-        <Stack direction="row" spacing="1rem" className={classes.viewModes}>
-          <IconButton disableRipple onClick={handleClickExport}>
-            <DownloadIcon />
-          </IconButton>
-          <Snackbar
-            open={openExport && isLoadingAllCve}
-            message="Getting your data ready for export"
-            action={<CircularProgress size="2rem" sx={{ color: '#FFFFFF' }} />}
-          />
-          <ToggleButton
-            value="viewLess"
-            title="Collapse list view"
-            size="small"
-            className={classes.view}
-            selected={!selectedViewMore}
-            onChange={() => setSelectedViewMore(false)}
-          >
-            <ViewHeadlineIcon />
-          </ToggleButton>
-          <ToggleButton
-            value="viewMore"
-            title="Expand list view"
-            size="small"
-            className={classes.view}
-            selected={selectedViewMore}
-            onChange={() => setSelectedViewMore(true)}
-            data-testid="expand-list-view-toggle"
-          >
-            <ViewAgendaIcon />
-          </ToggleButton>
-        </Stack>
-        <Menu
-          anchorEl={anchorExport}
-          open={openExport}
-          onClose={handleCloseExport}
-          data-testid="export-dropdown"
-          anchorOrigin={{
-            vertical: 'bottom',
-            horizontal: 'center'
-          }}
-          transformOrigin={{
-            vertical: 'top',
-            horizontal: 'center'
-          }}
-        >
-          <MenuItem
-            onClick={handleOnExportCSV}
-            disableRipple
-            disabled={isLoadingAllCve}
-            className={classes.popper}
-            data-testid="export-csv-menuItem"
-          >
-            csv
-          </MenuItem>
-          <Divider sx={{ my: 0.5 }} />
-          <MenuItem
-            onClick={handleOnExportExcel}
-            disableRipple
-            disabled={isLoadingAllCve}
-            className={classes.popper}
-            data-testid="export-excel-menuItem"
-          >
-            xlsx
-          </MenuItem>
-        </Menu>
-      </Stack>
+        </h2>
+
+        <div className="flex items-center gap-2 self-end">
+          {/* Export Menu Dropdown */}
+          <div className="relative" ref={exportMenuRef}>
+            <button
+              onClick={() => setIsExportMenuOpen(!isExportMenuOpen)}
+              className="p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition cursor-pointer focus:outline-none"
+              aria-label="Export vulnerabilities"
+            >
+              <Download className="w-5 h-5" data-testid="DownloadIcon" />
+            </button>
+            {isExportMenuOpen && (
+              <div
+                className="absolute right-0 mt-2 w-28 bg-slate-900 border border-slate-800 rounded-lg shadow-xl py-1 z-50 animate-in fade-in duration-100"
+                data-testid="export-dropdown"
+              >
+                <button
+                  onClick={handleOnExportCSV}
+                  disabled={isLoadingAllCve}
+                  className="w-full text-left px-4 py-2.5 text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition disabled:opacity-50 cursor-pointer"
+                  data-testid="export-csv-menuItem"
+                >
+                  csv
+                </button>
+                <div className="border-t border-slate-800/60" />
+                <button
+                  onClick={handleOnExportExcel}
+                  disabled={isLoadingAllCve}
+                  className="w-full text-left px-4 py-2.5 text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition disabled:opacity-50 cursor-pointer"
+                  data-testid="export-excel-menuItem"
+                >
+                  xlsx
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Export preparation Toast */}
+          {isExportMenuOpen && isLoadingAllCve && (
+            <div className="fixed bottom-4 right-4 bg-slate-900 border border-slate-800 text-slate-200 text-sm rounded-lg py-2.5 px-4 shadow-xl flex items-center gap-3 z-50">
+              <Loader2 className="w-4 h-4 animate-spin text-blue-500" />
+              <span>Getting your data ready for export</span>
+            </div>
+          )}
+
+          <div className="h-6 w-px bg-slate-800" />
+
+          {/* View Modes Toggle */}
+          <div className="flex border border-slate-800 bg-slate-950 rounded-lg p-0.5">
+            <button
+              onClick={() => setSelectedViewMore(false)}
+              className={`p-1.5 rounded transition cursor-pointer focus:outline-none ${
+                !selectedViewMore
+                  ? 'bg-blue-600 text-white shadow-sm'
+                  : 'text-slate-500 hover:text-slate-350'
+              }`}
+              title="Collapse list view"
+            >
+              <List className="w-4 h-4" data-testid="ViewHeadlineIcon" />
+            </button>
+            <button
+              onClick={() => setSelectedViewMore(true)}
+              className={`p-1.5 rounded transition cursor-pointer focus:outline-none ${
+                selectedViewMore
+                  ? 'bg-blue-600 text-white shadow-sm'
+                  : 'text-slate-500 hover:text-slate-350'
+              }`}
+              title="Expand list view"
+              data-testid="expand-list-view-toggle"
+            >
+              <LayoutList className="w-4 h-4" data-testid="ViewAgendaIcon" />
+            </button>
+          </div>
+        </div>
+      </div>
+
       {renderCVESummary()}
-      <Stack direction="row">
-        <div className={classes.dropdownArrowBox} onClick={handleExpandCVESearch}>
-          {!openExcludeSearch ? (
-            <KeyboardArrowRight className={classes.dropdownText} />
+
+      {/* Filter and Search Bar */}
+      <div className="flex items-start gap-2">
+        <button
+          onClick={() => setOpenExcludeSearch(!openExcludeSearch)}
+          className="p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition shrink-0 mt-0.5 cursor-pointer focus:outline-none"
+        >
+          {openExcludeSearch ? (
+            <ChevronDown className="w-5 h-5" data-testid="KeyboardArrowDownIcon" />
           ) : (
-            <KeyboardArrowDown className={classes.dropdownText} />
+            <ChevronRight className="w-5 h-5" data-testid="KeyboardArrowRightIcon" />
+          )}
+        </button>
+
+        <div className="flex-1 flex flex-col gap-2">
+          {/* Main search */}
+          <div>
+            <div className="flex items-center justify-between border border-slate-800 bg-slate-900/60 rounded-lg px-3.5 py-2">
+              <input
+                placeholder="Search"
+                onChange={debouncedChangeHandler}
+                className="w-full bg-transparent text-sm text-white placeholder-slate-500 focus:outline-none"
+              />
+              <Search className="w-4 h-4 text-slate-400 shrink-0 ml-2" />
+            </div>
+          </div>
+
+          {/* Exclude search panel */}
+          {openExcludeSearch && (
+            <div className="flex items-center justify-between border border-slate-800 bg-slate-900/60 rounded-lg px-3.5 py-2 animate-in slide-in-from-top-1 duration-100">
+              <input
+                placeholder="Exclude"
+                onChange={debouncedExcludeFilterChangeHandler}
+                className="w-full bg-transparent text-sm text-white placeholder-slate-500 focus:outline-none"
+              />
+            </div>
           )}
         </div>
-        <Stack className={classes.test} direction="column" spacing="0.25em">
-          <Stack className={classes.search}>
-            <InputBase
-              placeholder={'Search'}
-              classes={{ root: classes.searchInputBase, input: classes.input }}
-              onChange={debouncedChangeHandler}
-            />
-            <div className={classes.searchIcon}>
-              <SearchIcon />
-            </div>
-          </Stack>
+      </div>
 
-          <Collapse in={openExcludeSearch} timeout="auto" unmountOnExit>
-            <Stack className={classes.search}>
-              <InputBase
-                placeholder={'Exclude'}
-                classes={{ root: classes.searchInputBase, input: classes.input }}
-                onChange={debouncedExcludeFilterChangeHandler}
-              />
-            </Stack>
-          </Collapse>
-        </Stack>
-      </Stack>
-      <Stack direction="column" spacing={selectedViewMore ? '1rem' : '0.5rem'}>
+      {/* CVE items list */}
+      <div className={`flex flex-col ${selectedViewMore ? 'gap-4' : 'gap-2'} mt-2`}>
         {renderCVEs()}
         {renderListBottom()}
-      </Stack>
-    </Stack>
+      </div>
+    </div>
   );
 }
 

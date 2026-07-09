@@ -1,54 +1,18 @@
 import React, { useEffect, useMemo, useState } from 'react';
-
 import { isEmpty, isNil } from 'lodash';
 import { api, endpoints } from 'api';
 import { host } from '../../../host';
 
-import { Grid, Stack, Card, CardContent, Typography, Button } from '@mui/material';
 import Loading from '../../Shared/Loading';
 import ApiKeyDialog from './ApiKeyDialog';
 import ApiKeyConfirmDialog from './ApiKeyConfirmDialog';
 import ApiKeyCard from './ApiKeyCard';
-
-import { makeStyles } from '@mui/styles';
-
-const useStyles = makeStyles((theme) => ({
-  pageWrapper: {
-    backgroundColor: 'transparent',
-    height: '100%'
-  },
-  header: {
-    [theme.breakpoints.down('md')]: {
-      padding: '0'
-    }
-  },
-  cardRoot: {
-    boxShadow: 'none!important'
-  },
-  pageTitle: {
-    fontWeight: '600',
-    fontSize: '1.5rem',
-    color: theme.palette.secondary.main,
-    textAlign: 'left'
-  },
-  apikeysContainer: {
-    marginTop: '1.5rem',
-    height: '100%',
-    [theme.breakpoints.down('md')]: {
-      padding: '0'
-    }
-  },
-  apikeysContent: {
-    padding: '1.5rem'
-  }
-}));
 
 function ApiKeys() {
   const abortController = useMemo(() => new AbortController(), []);
   const [isLoading, setIsLoading] = useState(true);
   const [apiKeys, setApiKeys] = useState([]);
   const [newApiKey, setNewApiKey] = useState();
-  const classes = useStyles();
 
   // ApiKey dialog props
   const [apiKeyDialogOpen, setApiKeyDialogOpen] = useState(false);
@@ -89,7 +53,7 @@ function ApiKeys() {
   };
 
   const handleApiKeyRevokeConfirm = (status, apiKey) => {
-    if (status === 200) setApiKeys((prevState) => prevState.filter((ak) => ak.uuid != apiKey.uuid));
+    if (status === 200) setApiKeys((prevState) => prevState.filter((ak) => ak.uuid !== apiKey.uuid));
   };
 
   const renderApiKeys = () => {
@@ -103,41 +67,44 @@ function ApiKeys() {
       {isLoading ? (
         <Loading />
       ) : (
-        <Grid container className={classes.pageWrapper}>
-          <Grid item xs={12} md={12}>
-            <Card className={classes.cardRoot}>
-              <CardContent>
-                <Grid container className={classes.header}>
-                  <Grid item xs={12}>
-                    <Stack direction="row" justifyContent="space-between">
-                      <Typography variant="h4" className={classes.pageTitle}>
-                        Manage your API Keys
-                      </Typography>
-                      <Button variant="contained" color="success" onClick={handleApiKeyDialogOpen}>
-                        Create new API key
-                      </Button>
-                    </Stack>
-                  </Grid>
-                </Grid>
-              </CardContent>
-            </Card>
-          </Grid>
+        <div className="w-full flex flex-col gap-6 text-left">
+          {/* Header section */}
+          <div className="MuiCard-root bg-[#111827] border border-slate-800/80 rounded-2xl p-6 shadow-xl flex flex-col gap-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <h1 className="text-2xl font-bold text-white tracking-tight">
+                Manage your API Keys
+              </h1>
+              <button
+                onClick={handleApiKeyDialogOpen}
+                className="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-150 cursor-pointer focus:outline-none"
+              >
+                Create new API key
+              </button>
+            </div>
+          </div>
+
+          {/* API keys list card */}
           {!isLoading && !isEmpty(apiKeys) && (
-            <Grid item xs={12} className={classes.apikeysContainer}>
-              <Card className={classes.cardRoot}>
-                <CardContent className={classes.apikeysContent}>
-                  <Stack direction="column" spacing={1}>
-                    {renderApiKeys()}
-                  </Stack>
-                </CardContent>
-              </Card>
-            </Grid>
+            <div className="MuiCard-root bg-[#111827] border border-slate-800/80 rounded-2xl p-6 shadow-xl">
+              <div className="flex flex-col gap-3">
+                {renderApiKeys()}
+              </div>
+            </div>
           )}
-          <ApiKeyDialog open={apiKeyDialogOpen} setOpen={setApiKeyDialogOpen} onConfirm={handleApiKeyCreateConfirm} />
+
+          <ApiKeyDialog 
+            open={apiKeyDialogOpen} 
+            setOpen={setApiKeyDialogOpen} 
+            onConfirm={handleApiKeyCreateConfirm} 
+          />
           {!isNil(newApiKey) && (
-            <ApiKeyConfirmDialog open={apiKeyConfirmationOpen} setOpen={setApiKeyConfirmationOpen} apiKey={newApiKey} />
+            <ApiKeyConfirmDialog 
+              open={apiKeyConfirmationOpen} 
+              setOpen={setApiKeyConfirmationOpen} 
+              apiKey={newApiKey} 
+            />
           )}
-        </Grid>
+        </div>
       )}
     </>
   );

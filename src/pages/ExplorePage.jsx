@@ -1,46 +1,18 @@
 // components
-import React from 'react';
+import React, { useState } from 'react';
 import Header from '../components/Header/Header.jsx';
-
-import makeStyles from '@mui/styles/makeStyles';
-import { Container, Grid, Stack } from '@mui/material';
 import Explore from 'components/Explore/Explore.jsx';
-import { useState } from 'react';
-
-const useStyles = makeStyles(() => ({
-  container: {
-    paddingTop: 30,
-    paddingBottom: 5,
-    height: '100%',
-    minWidth: '60%'
-  },
-  gridWrapper: {
-    border: '0.0625rem #f2f2f2 dashed'
-  },
-  pageWrapper: {
-    height: '100%'
-  },
-  tile: {
-    width: '100%',
-    padding: 5
-  }
-}));
 
 function ExplorePage() {
-  const classes = useStyles();
   const [searchCurrentValue, setSearchCurrentValue] = useState();
 
   return (
-    <Stack className={classes.pageWrapper} direction="column" data-testid="explore-container">
+    <div className="flex flex-col min-h-screen bg-[#090d16]" data-testid="explore-container">
       <Header setSearchCurrentValue={setSearchCurrentValue} />
-      <Container className={classes.container}>
-        <Grid container className={classes.gridWrapper}>
-          <Grid item className={classes.tile}>
-            <Explore searchInputValue={searchCurrentValue} />
-          </Grid>
-        </Grid>
-      </Container>
-    </Stack>
+      <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-16">
+        <Explore searchInputValue={searchCurrentValue} />
+      </main>
+    </div>
   );
 }
 

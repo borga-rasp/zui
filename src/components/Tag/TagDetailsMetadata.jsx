@@ -1,57 +1,32 @@
-import React from 'react';
-
+import React, { useState } from 'react';
 import transform from '../../utilities/transform';
 import { DateTime } from 'luxon';
 import { Markdown } from 'utilities/MarkdowntojsxWrapper';
-
-import { Card, CardContent, Grid, Typography, Tooltip } from '@mui/material';
 import PullCommandButton from 'components/Shared/PullCommandButton';
 
-import makeStyles from '@mui/styles/makeStyles';
-
-const useStyles = makeStyles((theme) => ({
-  card: {
-    display: 'flex',
-    flexDirection: 'row',
-    alignItems: 'start',
-    background: '#FFFFFF',
-    borderRadius: '0.5rem',
-    borderColor: '#FFFFFF',
-    flex: 'none',
-    alignSelf: 'stretch',
-    flexGrow: 0,
-    order: 0,
-    width: '100%'
-  },
-  cardContent: {
-    padding: '0.5rem 1rem',
-    '&:last-child': {
-      paddingBottom: '0.5rem'
-    }
-  },
-  metadataHeader: {
-    color: theme.palette.secondary.dark
-  },
-  metadataBody: {
-    color: theme.palette.primary.main,
-    fontFamily: 'Roboto',
-    fontStyle: 'normal',
-    fontWeight: 400,
-    fontSize: '1rem',
-    lineHeight: '150%',
-    align: 'left'
-  },
-  pullImageContent: {
-    padding: '0',
-    width: '100%',
-    '&:last-child': {
-      paddingBottom: '0'
-    }
-  }
-}));
+// Custom Tooltip component in pure Tailwind CSS
+const Tooltip = ({ title, children }) => {
+  const [show, setShow] = useState(false);
+  return (
+    <div 
+      className="group relative inline-flex w-full items-center"
+      onMouseEnter={() => setShow(true)}
+      onMouseLeave={() => setShow(false)}
+    >
+      {children}
+      {title && show && (
+        <div className="absolute bottom-full left-1/2 z-[2000] mb-2 -translate-x-1/2 select-none pointer-events-none">
+          <div className="bg-slate-900 border border-slate-800 text-slate-100 text-xs rounded-lg px-2.5 py-1.5 shadow-xl max-w-xs whitespace-normal text-left">
+            {title}
+          </div>
+          <div className="w-2.5 h-2.5 bg-slate-900 border-r border-b border-slate-800 rotate-45 absolute -bottom-1.5 left-1/2 -translate-x-1/2" />
+        </div>
+      )}
+    </div>
+  );
+};
 
 function TagDetailsMetadata(props) {
-  const classes = useStyles();
   const { platform, lastUpdated, lastTagged, size, license, imageName } = props;
 
   const lastDate = lastUpdated
@@ -62,86 +37,62 @@ function TagDetailsMetadata(props) {
     ? DateTime.fromISO(lastTagged).toRelative({ unit: ['weeks', 'days', 'hours', 'minutes'] })
     : `Timestamp N/A`;
 
+  const MetaCard = ({ title, content, tooltip, labelTestId }) => {
+    return (
+      <div className="MuiCard-root w-full bg-[#111827] border border-slate-800/80 rounded-xl p-4 text-left shadow-md">
+        <span className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">
+          {title}
+        </span>
+        {tooltip ? (
+          <Tooltip title={tooltip}>
+            <div className="text-sm font-medium text-slate-200 cursor-help" data-testid={labelTestId}>
+              {content}
+            </div>
+          </Tooltip>
+        ) : (
+          <div className="text-sm font-medium text-slate-200" data-testid={labelTestId}>
+            {content}
+          </div>
+        )}
+      </div>
+    );
+  };
+
   return (
-    <Grid container spacing={'1rem'} data-testid="tagDetailsMetadata-container">
-      <Grid item xs={12} className={`hide-on-mobile`}>
-        <Card variant="outlined" className={classes.card}>
-          <CardContent className={`${classes.cardContent} ${classes.pullImageContent}`}>
-            <PullCommandButton imageName={imageName || ''} />
-          </CardContent>
-        </Card>
-      </Grid>
-      <Grid item xs={12}>
-        <Card variant="outlined" className={classes.card}>
-          <CardContent className={classes.cardContent}>
-            <Typography variant="body2" align="left" className={classes.metadataHeader}>
-              OS/Arch
-            </Typography>
-            <Typography variant="body1" className={classes.metadataBody}>
-              {platform?.Os || `----`} / {platform?.Arch || `----`}
-            </Typography>
-          </CardContent>
-        </Card>
-      </Grid>
-      <Grid item xs={12}>
-        <Card variant="outlined" className={classes.card}>
-          <CardContent className={classes.cardContent}>
-            <Typography variant="body2" align="left" className={classes.metadataHeader}>
-              Total Size
-            </Typography>
-            <Typography variant="body1" align="left" className={classes.metadataBody}>
-              {transform.formatBytes(size) || `----`}
-            </Typography>
-          </CardContent>
-        </Card>
-      </Grid>
-      <Grid container item xs={12} spacing={2}>
-        <Grid item xs={12}>
-          <Card variant="outlined" className={classes.card}>
-            <CardContent className={classes.cardContent}>
-              <Typography variant="body2" align="left" className={classes.metadataHeader}>
-                Created
-              </Typography>
-              <Tooltip title={lastUpdated?.slice(0, 16) || ' '} placement="top">
-                <Typography variant="body1" align="left" className={classes.metadataBody}>
-                  {lastDate}
-                </Typography>
-              </Tooltip>
-            </CardContent>
-          </Card>
-        </Grid>
-        <Grid item xs={12}>
-          <Card variant="outlined" className={classes.card}>
-            <CardContent className={classes.cardContent}>
-              <Typography variant="body2" align="left" className={classes.metadataHeader}>
-                Last Tagged
-              </Typography>
-              <Tooltip title={lastTagged?.slice(0, 16) || ' '} placement="top">
-                <Typography variant="body1" align="left" className={classes.metadataBody}>
-                  {lastTaggedDate}
-                </Typography>
-              </Tooltip>
-            </CardContent>
-          </Card>
-        </Grid>
-      </Grid>
-      <Grid container item xs={12} spacing={2}>
-        <Grid item xs={12}>
-          <Card variant="outlined" className={classes.card}>
-            <CardContent className={classes.cardContent}>
-              <Typography variant="body2" align="left" className={classes.metadataHeader}>
-                License
-              </Typography>
-              <Tooltip title={license || ' '} placement="top">
-                <Typography variant="body1" align="left" className={classes.metadataBody}>
-                  {license ? <Markdown>{license}</Markdown> : `License info not available`}
-                </Typography>
-              </Tooltip>
-            </CardContent>
-          </Card>
-        </Grid>
-      </Grid>
-    </Grid>
+    <div className="flex flex-col gap-4" data-testid="tagDetailsMetadata-container">
+      {/* Pull command */}
+      <div className="MuiCard-root hidden sm:block w-full bg-[#111827] border border-slate-800/80 rounded-xl p-0 overflow-hidden shadow-md">
+        <PullCommandButton imageName={imageName || ''} />
+      </div>
+
+      <MetaCard 
+        title="OS/Arch" 
+        content={`${platform?.Os || '----'} / ${platform?.Arch || '----'}`} 
+      />
+
+      <MetaCard 
+        title="Total Size" 
+        content={transform.formatBytes(size) || '----'} 
+      />
+
+      <MetaCard 
+        title="Created" 
+        content={lastDate} 
+        tooltip={lastUpdated?.slice(0, 16) || ' '} 
+      />
+
+      <MetaCard 
+        title="Last Tagged" 
+        content={lastTaggedDate} 
+        tooltip={lastTagged?.slice(0, 16) || ' '} 
+      />
+
+      <MetaCard 
+        title="License" 
+        content={license ? <Markdown>{license}</Markdown> : 'License info not available'} 
+        tooltip={license || ' '} 
+      />
+    </div>
   );
 }
 

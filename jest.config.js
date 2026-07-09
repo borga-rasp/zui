@@ -21,7 +21,7 @@ export const moduleNameMapper = {
 export const transform = {
   '^.+\\.(js|jsx)$': 'babel-jest'
 };
-export const transformIgnorePatterns = ['node_modules/(?!(axios|react-router|react-router-dom|@mui|@emotion)/)'];
+export const transformIgnorePatterns = ['node_modules/(?!(axios|react-router|react-router-dom|@mui|@emotion|lucide-react)/)'];
 export const collectCoverageFrom = [
   'src/**/*.{js,jsx}',
   '!src/index.jsx',

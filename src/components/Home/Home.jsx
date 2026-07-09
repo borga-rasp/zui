@@ -1,5 +1,3 @@
-import { Stack, Typography } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { api, endpoints } from 'api';
 import { host } from '../../host';
 import React, { useEffect, useMemo, useState } from 'react';
@@ -17,75 +15,6 @@ import {
 import { isEmpty } from 'lodash';
 import NoDataComponent from 'components/Shared/NoDataComponent';
 
-const useStyles = makeStyles((theme) => ({
-  gridWrapper: {
-    marginTop: 10,
-    marginBottom: '5rem'
-  },
-  nodataWrapper: {
-    backgroundColor: '#fff',
-    height: '100vh'
-  },
-  exploreText: {
-    color: '#C0C0C0',
-    display: 'flex',
-    alignItems: 'left'
-  },
-  resultsRow: {
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    color: '#00000099'
-  },
-  title: {
-    fontWeight: '700',
-    color: '#0F2139',
-    width: '100%',
-    display: 'inline',
-    fontSize: '2.5rem',
-    textAlign: 'center',
-    letterSpacing: '-0.02rem'
-  },
-  sectionHeaderContainer: {
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    flexDirection: 'column',
-    width: '100%',
-    paddingTop: '1rem',
-    marginBottom: '1rem',
-    [theme.breakpoints.up('md')]: {
-      alignItems: 'flex-end',
-      flexDirection: 'row'
-    }
-  },
-  sectionTitle: {
-    fontWeight: '700',
-    color: '#0F2139',
-    width: '100%',
-    fontSize: '2rem',
-    textAlign: 'center',
-    lineHeight: '2.375rem',
-    letterSpacing: '-0.01rem',
-    marginLeft: '0.5rem'
-  },
-  subtitle: {
-    color: '#00000099',
-    fontWeight: 400,
-    fontSize: '1rem',
-    textAlign: 'center',
-    lineHeight: '150%',
-    letterSpacing: '0.009375rem',
-    width: '65%'
-  },
-  viewAll: {
-    color: '#52637A',
-    fontWeight: '600',
-    fontSize: '1rem',
-    lineHeight: '1.5rem',
-    cursor: 'pointer',
-    marginRight: '0.5rem'
-  }
-}));
-
 function Home() {
   const [isLoading, setIsLoading] = useState(true);
   const [popularData, setPopularData] = useState([]);
@@ -99,7 +28,6 @@ function Home() {
 
   const navigate = useNavigate();
   const abortController = useMemo(() => new AbortController(), []);
-  const classes = useStyles();
 
   const getPopularData = () => {
     setIsLoadingPopular(true);
@@ -252,30 +180,32 @@ function Home() {
 
   const renderCards = (cardArray) => {
     return (
-      cardArray &&
-      cardArray.map((item, index) => {
-        return (
-          <RepoCard
-            name={item.name}
-            version={item.latestVersion}
-            description={item.description}
-            downloads={item.downloads}
-            stars={item.stars}
-            signatureInfo={item.signatureInfo}
-            isBookmarked={item.isBookmarked}
-            isStarred={item.isStarred}
-            vendor={item.vendor}
-            platforms={item.platforms}
-            key={index}
-            vulnerabilityData={{
-              vulnerabilitySeverity: item.vulnerabiltySeverity,
-              count: item.vulnerabilityCount
-            }}
-            lastUpdated={item.lastUpdated}
-            logo={item.logo}
-          />
-        );
-      })
+      <div className="w-full flex flex-col gap-4">
+        {cardArray &&
+          cardArray.map((item, index) => {
+            return (
+              <RepoCard
+                name={item.name}
+                version={item.latestVersion}
+                description={item.description}
+                downloads={item.downloads}
+                stars={item.stars}
+                signatureInfo={item.signatureInfo}
+                isBookmarked={item.isBookmarked}
+                isStarred={item.isStarred}
+                vendor={item.vendor}
+                platforms={item.platforms}
+                key={index}
+                vulnerabilityData={{
+                  vulnerabilitySeverity: item.vulnerabiltySeverity,
+                  count: item.vulnerabilityCount
+                }}
+                lastUpdated={item.lastUpdated}
+                logo={item.logo}
+              />
+            );
+          })}
+      </div>
     );
   };
 
@@ -283,81 +213,75 @@ function Home() {
     return isNoData() === true ? (
       <NoDataComponent text="No images" />
     ) : (
-      <Stack alignItems="center" className={classes.gridWrapper}>
-        <Stack className={classes.sectionHeaderContainer} sx={{ paddingTop: '3rem' }}>
-          <div>
-            <Typography variant="h4" align="left" className={classes.sectionTitle}>
+      <div className="w-full flex flex-col items-center gap-12 mt-4 pb-20">
+        {/* Most popular Section */}
+        <div className="w-full flex flex-col gap-6">
+          <div className="flex flex-row justify-between items-end border-b border-slate-800 pb-3">
+            <h2 className="text-2xl font-bold text-white tracking-tight">
               Most popular images
-            </Typography>
-          </div>
-          <div onClick={() => handleClickViewAll('sortby', sortByCriteria.downloads.value)}>
-            <Typography variant="body2" className={classes.viewAll}>
-              View all
-            </Typography>
-          </div>
-        </Stack>
-        {isLoadingPopular ? <Loading /> : renderCards(popularData, isLoadingPopular)}
-        {/* currently most popular will be by downloads until stars are implemented */}
-        <Stack className={classes.sectionHeaderContainer}>
-          <div>
-            <Typography variant="h4" align="left" className={classes.sectionTitle}>
-              Recently updated images
-            </Typography>
-          </div>
-          <div>
-            <Typography
-              variant="body2"
-              className={classes.viewAll}
-              onClick={() => handleClickViewAll('sortby', sortByCriteria.updateTime.value)}
+            </h2>
+            <button
+              onClick={() => handleClickViewAll('sortby', sortByCriteria.downloads.value)}
+              className="text-sm font-semibold text-blue-400 hover:text-blue-300 transition cursor-pointer"
             >
               View all
-            </Typography>
+            </button>
           </div>
-        </Stack>
-        {isLoadingRecent ? <Loading /> : renderCards(recentData, isLoadingRecent)}
+          {isLoadingPopular ? <Loading /> : renderCards(popularData)}
+        </div>
+
+        {/* Recently updated Section */}
+        <div className="w-full flex flex-col gap-6">
+          <div className="flex flex-row justify-between items-end border-b border-slate-800 pb-3">
+            <h2 className="text-2xl font-bold text-white tracking-tight">
+              Recently updated images
+            </h2>
+            <button
+              onClick={() => handleClickViewAll('sortby', sortByCriteria.updateTime.value)}
+              className="text-sm font-semibold text-blue-400 hover:text-blue-300 transition cursor-pointer"
+            >
+              View all
+            </button>
+          </div>
+          {isLoadingRecent ? <Loading /> : renderCards(recentData)}
+        </div>
+
+        {/* Bookmarks Section */}
         {!isEmpty(bookmarkData) && (
-          <>
-            <Stack className={classes.sectionHeaderContainer}>
-              <div>
-                <Typography variant="h4" align="left" className={classes.sectionTitle}>
-                  Bookmarks
-                </Typography>
-              </div>
-              <div>
-                <Typography
-                  variant="body2"
-                  className={classes.viewAll}
-                  onClick={() => handleClickViewAll('filter', 'IsBookmarked')}
-                >
-                  View all
-                </Typography>
-              </div>
-            </Stack>
-            {isLoadingBookmarks ? <Loading /> : renderCards(bookmarkData, isLoadingBookmarks)}
-          </>
+          <div className="w-full flex flex-col gap-6">
+            <div className="flex flex-row justify-between items-end border-b border-slate-800 pb-3">
+              <h2 className="text-2xl font-bold text-white tracking-tight">
+                Bookmarks
+              </h2>
+              <button
+                onClick={() => handleClickViewAll('filter', 'IsBookmarked')}
+                className="text-sm font-semibold text-blue-400 hover:text-blue-300 transition cursor-pointer"
+              >
+                View all
+              </button>
+            </div>
+            {isLoadingBookmarks ? <Loading /> : renderCards(bookmarkData)}
+          </div>
         )}
+
+        {/* Stars Section */}
         {!isEmpty(starData) && (
-          <>
-            <Stack className={classes.sectionHeaderContainer}>
-              <div>
-                <Typography variant="h4" align="left" className={classes.sectionTitle}>
-                  Stars
-                </Typography>
-              </div>
-              <div>
-                <Typography
-                  variant="body2"
-                  className={classes.viewAll}
-                  onClick={() => handleClickViewAll('filter', 'IsStarred')}
-                >
-                  View all
-                </Typography>
-              </div>
-            </Stack>
-            {isLoadingStars ? <Loading /> : renderCards(starData, isLoadingStars)}
-          </>
+          <div className="w-full flex flex-col gap-6">
+            <div className="flex flex-row justify-between items-end border-b border-slate-800 pb-3">
+              <h2 className="text-2xl font-bold text-white tracking-tight">
+                Stars
+              </h2>
+              <button
+                onClick={() => handleClickViewAll('filter', 'IsStarred')}
+                className="text-sm font-semibold text-blue-400 hover:text-blue-300 transition cursor-pointer"
+              >
+                View all
+              </button>
+            </div>
+            {isLoadingStars ? <Loading /> : renderCards(starData)}
+          </div>
         )}
-      </Stack>
+      </div>
     );
   };
 

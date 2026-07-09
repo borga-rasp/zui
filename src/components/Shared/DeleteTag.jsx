@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { IconButton } from '@mui/material';
-import DeleteIcon from '@mui/icons-material/Delete';
+import { Trash2 } from 'lucide-react';
 
 // utility
 import { api, endpoints } from '../../api';
@@ -25,7 +24,7 @@ export default function DeleteTag(props) {
     api
       .delete(`${host()}${endpoints.deleteImage(repo, tag)}`)
       .then((response) => {
-        if (response && response.status == 202) {
+        if (response && response.status === 202) {
           onTagDelete(tag);
         }
       })
@@ -40,9 +39,13 @@ export default function DeleteTag(props) {
 
   return (
     <React.Fragment>
-      <IconButton onClick={handleClickOpen}>
-        <DeleteIcon />
-      </IconButton>
+      <button
+        onClick={handleClickOpen}
+        className="p-1.5 text-slate-500 hover:text-red-500 hover:bg-slate-800 rounded-lg transition cursor-pointer focus:outline-none"
+        aria-label="Delete tag"
+      >
+        <Trash2 className="w-4 h-4" />
+      </button>
       <DeleteTagConfirmDialog
         onClose={handleClose}
         open={open}

@@ -1,93 +1,41 @@
 import React, { useState } from 'react';
-import { makeStyles } from '@mui/styles';
 import { useNavigate } from 'react-router';
-import { Box, Card, CardContent, Collapse, Grid, Stack, Tooltip, Typography, Divider } from '@mui/material';
 import { Markdown } from 'utilities/MarkdowntojsxWrapper';
 import transform from 'utilities/transform';
 import { DateTime } from 'luxon';
-import { KeyboardArrowDown, KeyboardArrowRight } from '@mui/icons-material';
+import { ChevronRight, ChevronDown } from 'lucide-react';
 import DeleteTag from 'components/Shared/DeleteTag';
 
-const useStyles = makeStyles((theme) => ({
-  card: {
-    marginBottom: '1rem',
-    display: 'flex',
-    flexDirection: 'row',
-    alignItems: 'center',
-    background: '#FFFFFF',
-    boxShadow: 'none',
-    border: '1px solid #E0E5EB',
-    borderRadius: '0.75rem',
-    flex: 'none',
-    alignSelf: 'stretch',
-    flexGrow: 0,
-    order: 0,
-    width: '100%'
-  },
-  content: {
-    textAlign: 'left',
-    color: '#606060',
-    padding: '2% 3% 2% 3%',
-    width: '100%'
-  },
-  clickCursor: {
-    cursor: 'pointer'
-  },
-  dropdownToggle: {
-    color: '#1479FF',
-    paddingTop: '1rem',
-    fontSize: '0.8125rem',
-    fontWeight: '600',
-    cursor: 'pointer'
-  },
-  dropdown: {
-    flexDirection: 'row',
-    alignItems: 'center'
-  },
-  dropdownText: {
-    color: '#1479FF',
-    paddingTop: '1rem',
-    fontSize: '1rem',
-    fontWeight: '600',
-    cursor: 'pointer',
-    textAlign: 'center'
-  },
-  tagHeading: {
-    color: '#828282',
-    fontSize: '1rem',
-    marginBottom: '0.5rem'
-  },
-  tagName: {
-    color: '#1479FF',
-    fontSize: '1rem',
-    marginBottom: '0.5rem',
-    textDecorationLine: 'underline',
-    cursor: 'pointer'
-  },
-  cardDivider: {
-    marginTop: '1rem',
-    marginBottom: '1rem',
-    border: '1px solid #E0E5EB'
-  },
-  manifsetsTable: {
-    marginTop: '1rem'
-  },
-  tableHeaderText: {
-    color: theme.palette.secondary.dark,
-    fontSize: '1rem'
-  }
-}));
+// Custom Tooltip component in pure Tailwind CSS
+const Tooltip = ({ title, children }) => {
+  const [show, setShow] = useState(false);
+  return (
+    <div 
+      className="group relative inline-flex items-center"
+      onMouseEnter={() => setShow(true)}
+      onMouseLeave={() => setShow(false)}
+    >
+      {children}
+      {title && show && (
+        <div className="absolute bottom-full left-1/2 z-[2000] mb-2 -translate-x-1/2 select-none pointer-events-none">
+          <div className="bg-slate-900 border border-slate-800 text-slate-100 text-xs rounded-lg px-2.5 py-1.5 shadow-xl max-w-xs whitespace-normal text-left">
+            {title}
+          </div>
+          <div className="w-2.5 h-2.5 bg-slate-900 border-r border-b border-slate-800 rotate-45 absolute -bottom-1.5 left-1/2 -translate-x-1/2" />
+        </div>
+      )}
+    </div>
+  );
+};
 
 export default function TagCard(props) {
   const { repoName, tag, lastUpdated, vendor, manifests, repo, onTagDelete, isDeletable } = props;
   const [open, setOpen] = useState(false);
-
-  const classes = useStyles();
+  const navigate = useNavigate();
 
   const lastDate = lastUpdated
     ? DateTime.fromISO(lastUpdated).toRelative({ unit: ['weeks', 'days', 'hours', 'minutes'] })
     : `Timestamp N/A`;
-  const navigate = useNavigate();
 
   const goToTags = (digest = null) => {
     if (repoName) {
@@ -98,94 +46,80 @@ export default function TagCard(props) {
   };
 
   return (
-    <Card className={classes.card} raised>
-      <CardContent className={classes.content}>
-        <Stack direction="row" spacing={2} justifyContent="space-between">
-          <Typography variant="body1" align="left" className={classes.tagHeading}>
-            Tag
-          </Typography>
-          {isDeletable && <DeleteTag repo={repo} tag={tag} onTagDelete={onTagDelete} />}
-        </Stack>
-        <Typography variant="body1" align="left" className={classes.tagName} onClick={() => goToTags()}>
-          {repoName && `${repoName}:`}
-          {tag}
-        </Typography>
+    <div className="MuiCard-root w-full bg-slate-900/60 border border-slate-800/80 rounded-xl p-5 text-left shadow-sm">
+      <div className="flex flex-row justify-between items-center mb-1">
+        <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+          Tag
+        </span>
+        {isDeletable && <DeleteTag repo={repo} tag={tag} onTagDelete={onTagDelete} />}
+      </div>
 
-        <Stack sx={{ display: 'inline' }} direction="row" spacing={0.5}>
-          <Typography variant="caption" sx={{ fontWeight: '400', fontSize: '0.8125rem' }}>
-            Created
-          </Typography>
-          <Tooltip title={lastUpdated?.slice(0, 16) || ' '} placement="top">
-            <Typography variant="caption" sx={{ fontWeight: '600', fontSize: '0.8125rem' }}>
-              {lastDate} by <Markdown options={{ forceInline: true }}>{vendor || 'Vendor not available'}</Markdown>
-            </Typography>
-          </Tooltip>
-        </Stack>
-        <Divider variant="fullWidth" className={classes.cardDivider} />
-        <Stack direction="row" onClick={() => setOpen(!open)}>
-          {!open ? (
-            <KeyboardArrowRight className={classes.dropdownText} />
-          ) : (
-            <KeyboardArrowDown className={classes.dropdownText} />
-          )}
-          <Typography className={classes.dropdownToggle}>{!open ? `Show more` : `Show less`}</Typography>
-        </Stack>
-        <Collapse in={open} timeout="auto" unmountOnExit>
-          <Box className={classes.manifsetsTable}>
-            <Grid container item xs={12} direction={'row'}>
-              <Grid item xs={6} md={6}>
-                <Typography variant="body1" className={classes.tableHeaderText}>
-                  DIGEST
-                </Typography>
-              </Grid>
-              <Grid item xs={6} md={3} className={classes.tableHeaderText}>
-                <Typography variant="body1">OS/Arch</Typography>
-              </Grid>
-              <Grid
-                item
-                xs={0}
-                md={3}
-                className={`${classes.tableHeaderText} hide-on-mobile`}
-                sx={{ display: 'flex', justifyContent: 'flex-end' }}
-              >
-                <Typography variant="body1"> COMPRESSED SIZE </Typography>
-              </Grid>
-            </Grid>
+      <button
+        onClick={() => goToTags()}
+        className="text-base font-bold text-blue-400 hover:text-blue-300 underline mb-2 transition text-left cursor-pointer focus:outline-none"
+      >
+        {repoName && `${repoName}:`}
+        {tag}
+      </button>
 
-            {manifests.map((el) => (
-              <Grid container item xs={12} key={el.digest} direction={'row'}>
-                <Grid item xs={6} md={6}>
-                  <Tooltip title={el.digest || ''} placement="top">
-                    <Typography
-                      variant="body1"
-                      sx={{ color: '#1479FF', textDecorationLine: 'underline', cursor: 'pointer' }}
-                      onClick={() => goToTags(el.digest)}
-                    >
-                      {el.digest?.substr(0, 12)}
-                    </Typography>
-                  </Tooltip>
-                </Grid>
-                <Grid item xs={6} md={3}>
-                  <Typography variant="body1" color="primary">
-                    {el.platform?.Os || '----'}/{el.platform?.Arch || '----'}
-                  </Typography>
-                </Grid>
-                <Grid
-                  item
-                  xs={0}
-                  md={3}
-                  className="hide-on-mobile"
-                  sx={{ display: 'flex', justifyContent: 'flex-end' }}
-                >
-                  <Typography sx={{ textAlign: 'right' }} variant="body1" color="primary">
-                    {transform.formatBytes(el.size)}
-                  </Typography>
-                </Grid>
-              </Grid>
-            ))}
-          </Box>
-        </Collapse>
-      </CardContent>
-    </Card>
+      <div className="flex items-center gap-1 text-xs text-slate-500">
+        <span>Created</span>
+        <Tooltip title={lastUpdated?.slice(0, 16) || ' '}>
+          <span className="font-semibold text-slate-350 cursor-help">
+            {lastDate} by <Markdown options={{ forceInline: true }}>{vendor || 'Vendor not available'}</Markdown>
+          </span>
+        </Tooltip>
+      </div>
+
+      <div className="border-t border-slate-800/60 my-4" />
+
+      {/* Dropdown trigger */}
+      <div>
+        <button
+          onClick={() => setOpen(!open)}
+          className="flex items-center gap-1 text-xs font-bold uppercase tracking-wider text-indigo-400 hover:text-indigo-350 transition cursor-pointer focus:outline-none"
+        >
+          {open ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+          <span>{!open ? `Show more` : `Show less`}</span>
+        </button>
+
+        {/* Collapsed table of manifests */}
+        {open && manifests && manifests.length > 0 && (
+          <div className="mt-4 overflow-x-auto animate-in fade-in duration-100">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="border-b border-slate-800 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                  <th className="py-2 pr-4">Digest</th>
+                  <th className="py-2 px-4">OS/Arch</th>
+                  <th className="py-2 pl-4 text-right hidden sm:table-cell">Compressed Size</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-800/60">
+                {manifests.map((el) => (
+                  <tr key={el.digest} className="text-xs">
+                    <td className="py-2.5 pr-4">
+                      <Tooltip title={el.digest || ''}>
+                        <button
+                          onClick={() => goToTags(el.digest)}
+                          className="text-indigo-400 hover:text-indigo-355 underline font-mono cursor-pointer focus:outline-none text-left"
+                        >
+                          {el.digest?.substr(0, 12)}
+                        </button>
+                      </Tooltip>
+                    </td>
+                    <td className="py-2.5 px-4 text-slate-300">
+                      {el.platform?.Os || '----'}/{el.platform?.Arch || '----'}
+                    </td>
+                    <td className="py-2.5 pl-4 text-right text-slate-300 hidden sm:table-cell">
+                      {transform.formatBytes(el.size)}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+    </div>
   );
 }

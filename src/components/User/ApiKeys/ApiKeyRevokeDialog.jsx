@@ -1,33 +1,9 @@
 import React from 'react';
-
 import { api, endpoints } from 'api';
 import { host } from 'host';
 
-import { Dialog, DialogContent, DialogTitle, DialogActions, Button, Typography, Grid } from '@mui/material';
-
-import { makeStyles } from '@mui/styles';
-
-const useStyles = makeStyles(() => ({
-  gridWrapper: {
-    paddingTop: '2rem',
-    paddingBottom: '2rem'
-  },
-  apiKeyDisplay: {
-    boxSizing: 'border-box',
-    color: '#52637A',
-    fontSize: '1rem',
-    fontWeight: '400',
-    padding: '0.75rem',
-    backgroundColor: '#F7F7F7',
-    borderRadius: '0.9rem',
-    overflowWrap: 'break-word'
-  }
-}));
-
 function ApiKeyRevokeDialog(props) {
   const { open, setOpen, apiKey, onConfirm } = props;
-
-  const classes = useStyles();
 
   const handleClose = () => {
     setOpen(false);
@@ -45,26 +21,35 @@ function ApiKeyRevokeDialog(props) {
       });
   };
 
-  return (
-    <Dialog open={open} onClose={handleClose}>
-      <DialogTitle>Revoke &quot;{apiKey?.label}&quot; key</DialogTitle>
-      <DialogContent className={classes.apiKeyForm}>
-        <Grid container className={classes.gridWrapper}>
-          <Grid item xs={12}>
-            <Typography>Are you sure you want to revoke this api key?</Typography>
-          </Grid>
-        </Grid>
-      </DialogContent>
+  if (!open) return null;
 
-      <DialogActions>
-        <Button variant="contained" color="error" onClick={handleSubmit}>
-          Revoke
-        </Button>
-        <Button variant="outlined" onClick={handleClose}>
-          Close
-        </Button>
-      </DialogActions>
-    </Dialog>
+  return (
+    <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4 bg-slate-950/75 backdrop-blur-sm animate-in fade-in duration-200">
+      <div className="w-full max-w-sm bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-2xl animate-in zoom-in-95 duration-200 text-left">
+        <h3 className="text-lg font-bold text-white mb-4">
+          Revoke "{apiKey?.label}" key
+        </h3>
+        
+        <p className="text-sm text-slate-350 mb-6">
+          Are you sure you want to revoke this api key?
+        </p>
+
+        <div className="flex items-center justify-end gap-3">
+          <button
+            onClick={handleClose}
+            className="bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold py-2.5 px-5 rounded-lg transition cursor-pointer focus:outline-none"
+          >
+            Close
+          </button>
+          <button
+            onClick={handleSubmit}
+            className="bg-red-600 hover:bg-red-700 text-white font-semibold py-2.5 px-5 rounded-lg transition cursor-pointer focus:outline-none"
+          >
+            Revoke
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }
 

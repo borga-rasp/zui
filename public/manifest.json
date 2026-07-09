@@ -1,6 +1,6 @@
 {
-  "short_name": "Zot Registry",
-  "name": "A graphical user interface to interact with a zot server instance",
+  "short_name": "Borga Registry",
+  "name": "Borga Registry Server UI",
   "icons": [
     {
       "src": "favicon.ico",

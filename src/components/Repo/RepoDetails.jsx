@@ -14,16 +14,12 @@ import { isAuthenticated } from 'utilities/authUtilities';
 import filterConstants from 'utilities/filterConstants';
 
 // components
-import { Card, CardContent, CardMedia, Chip, Grid, Stack, Tooltip, Typography, IconButton } from '@mui/material';
-import BookmarkIcon from '@mui/icons-material/Bookmark';
-import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
-import StarIcon from '@mui/icons-material/Star';
-import StarBorderIcon from '@mui/icons-material/StarBorder';
 import Tags from './Tabs/Tags.jsx';
 import RepoDetailsMetadata from './RepoDetailsMetadata';
 import Loading from '../Shared/Loading';
 import { Markdown } from 'utilities/MarkdowntojsxWrapper';
 import { VulnerabilityIconCheck, SignatureIconCheck } from 'utilities/vulnerabilityAndSignatureCheck';
+import { Bookmark, Star } from 'lucide-react';
 
 // placeholder images
 import repocube1 from '../../assets/repocube-1.png';
@@ -31,125 +27,28 @@ import repocube2 from '../../assets/repocube-2.png';
 import repocube3 from '../../assets/repocube-3.png';
 import repocube4 from '../../assets/repocube-4.png';
 
-import makeStyles from '@mui/styles/makeStyles';
-
-const useStyles = makeStyles((theme) => ({
-  pageWrapper: {
-    backgroundColor: 'transparent',
-    height: '100%'
-  },
-  repoName: {
-    fontWeight: '600',
-    fontSize: '1.5rem',
-    color: theme.palette.secondary.main,
-    textAlign: 'left'
-  },
-  avatar: {
-    height: '1.438rem',
-    width: '1.438rem',
-    objectFit: 'fill'
-  },
-  cardBtn: {
-    height: '100%',
-    width: '100%'
-  },
-  media: {
-    borderRadius: '3.125em'
-  },
-  tags: {
-    marginTop: '1.5rem',
-    height: '100%',
-    [theme.breakpoints.down('md')]: {
-      padding: '0'
-    }
-  },
-  metadata: {
-    marginTop: '1.5rem',
-    paddingLeft: '1.25rem',
-    [theme.breakpoints.down('md')]: {
-      marginTop: '1rem',
-      paddingLeft: '0'
-    }
-  },
-  card: {
-    marginBottom: 2,
-    display: 'flex',
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    background: '#FFFFFF',
-    border: '0.0625rem solid #E0E5EB',
-    borderRadius: '0.75rem',
-    alignSelf: 'stretch',
-    width: '100%',
-    boxShadow: 'none!important'
-  },
-  tagsContent: {
-    padding: '1.5rem'
-  },
-  platformText: {
-    backgroundColor: '#EDE7F6',
-    color: '#220052',
-    fontWeight: '400',
-    fontSize: '0.8125rem',
-    lineHeight: '1.125rem',
-    letterSpacing: '0.01rem'
-  },
-  inputForm: {
-    textAlign: 'left',
-    '& fieldset': {
-      border: '0.125rem solid #52637A'
-    }
-  },
-  cardRoot: {
-    boxShadow: 'none!important'
-  },
-  header: {
-    [theme.breakpoints.down('md')]: {
-      padding: '0'
-    }
-  },
-  repoTitle: {
-    textAlign: 'left',
-    fontSize: '1rem',
-    lineHeight: '1.5rem',
-    color: 'rgba(0, 0, 0, 0.6)',
-    padding: '1rem 0 0 0',
-    [theme.breakpoints.down('md')]: {
-      padding: '0.5rem 0 0 0'
-    }
-  },
-  platformChipsContainer: {
-    alignItems: 'center',
-    padding: '0.15rem 0 0 0',
-    [theme.breakpoints.down('md')]: {
-      padding: '0.5rem 0 0 0'
-    }
-  },
-  platformChips: {
-    backgroundColor: '#E0E5EB',
-    color: '#52637A',
-    fontSize: '0.813rem',
-    lineHeight: '0.813rem',
-    borderRadius: '0.375rem',
-    padding: '0.313rem 0.625rem'
-  },
-  chipLabel: {
-    padding: '0'
-  },
-  vendor: {
-    color: theme.palette.primary.main,
-    fontSize: '0.75rem',
-    maxWidth: '50%',
-    textOverflow: 'ellipsis',
-    lineHeight: '1.125rem'
-  },
-  versionLast: {
-    color: theme.palette.secondary.dark,
-    fontSize: '0.75rem',
-    lineHeight: '1.125rem',
-    textOverflow: 'ellipsis'
-  }
-}));
+// Custom Tooltip component in pure Tailwind CSS
+// Custom Tooltip component in pure Tailwind CSS with hover state for test compatibility
+const Tooltip = ({ title, children }) => {
+  const [show, setShow] = useState(false);
+  return (
+    <div 
+      className="group relative inline-flex items-center"
+      onMouseEnter={() => setShow(true)}
+      onMouseLeave={() => setShow(false)}
+    >
+      {children}
+      {title && show && (
+        <div className="absolute bottom-full left-1/2 z-[2000] mb-2 -translate-x-1/2 select-none pointer-events-none">
+          <div className="bg-slate-900 border border-slate-800 text-slate-100 text-xs rounded-lg px-2.5 py-1.5 shadow-xl max-w-xs whitespace-normal text-left">
+            {title}
+          </div>
+          <div className="w-2.5 h-2.5 bg-slate-900 border-r border-b border-slate-800 rotate-45 absolute -bottom-1.5 left-1/2 -translate-x-1/2" />
+        </div>
+      )}
+    </div>
+  );
+};
 
 // temporary utility to get image
 const randomIntFromInterval = (min, max) => {
@@ -166,11 +65,9 @@ function RepoDetails() {
   const [tags, setTags] = useState([]);
   const placeholderImage = useRef(randomImage());
   const [isLoading, setIsLoading] = useState(true);
-  // get url param from <Route here (i.e. image name)
   const { name } = useParams();
   const navigate = useNavigate();
   const abortController = useMemo(() => new AbortController(), []);
-  const classes = useStyles();
 
   useEffect(() => {
     setIsLoading(true);
@@ -203,7 +100,7 @@ function RepoDetails() {
   };
 
   const handlePlatformChipClick = (event) => {
-    const { textContent } = event.target;
+    const textContent = event.target.textContent;
     event.stopPropagation();
     event.preventDefault();
     navigate({ pathname: `/explore`, search: createSearchParams({ filter: textContent }).toString() });
@@ -214,15 +111,13 @@ function RepoDetails() {
     const filteredPlatforms = platforms?.flatMap((platform) => [platform.Os, platform.Arch]);
 
     return uniq(filteredPlatforms).map((platform, index) => (
-      <Chip
+      <button
         key={`${name}${platform}${index}`}
-        label={platform}
         onClick={handlePlatformChipClick}
-        className={classes.platformChips}
-        classes={{
-          label: classes.chipLabel
-        }}
-      />
+        className="bg-slate-800/85 hover:bg-slate-700 text-slate-350 hover:text-white text-xs font-semibold rounded px-2.5 py-0.5 border border-slate-800 transition cursor-pointer"
+      >
+        {platform}
+      </button>
     ));
   };
 
@@ -265,19 +160,19 @@ function RepoDetails() {
     const cosign = repoDetailData.signatureInfo
       ?.map((s) => s.tool)
       .includes(filterConstants.signatureToolConstants.COSIGN)
-      ? repoDetailData.signatureInfo.filter((si) => si.tool == filterConstants.signatureToolConstants.COSIGN)
+      ? repoDetailData.signatureInfo.filter((si) => si.tool === filterConstants.signatureToolConstants.COSIGN)
       : null;
     const notation = repoDetailData.signatureInfo
       ?.map((s) => s.tool)
       .includes(filterConstants.signatureToolConstants.NOTATION)
-      ? repoDetailData.signatureInfo.filter((si) => si.tool == filterConstants.signatureToolConstants.NOTATION)
+      ? repoDetailData.signatureInfo.filter((si) => si.tool === filterConstants.signatureToolConstants.NOTATION)
       : null;
     const sigArray = [];
     if (cosign) sigArray.push(cosign);
     if (notation) sigArray.push(notation);
     if (sigArray.length === 0) return <SignatureIconCheck />;
     return sigArray.map((sig, index) => (
-      <div className="hide-on-mobile" key={`${name}sig${index}`}>
+      <div className="hidden sm:inline-flex" key={`${name}sig${index}`}>
         <SignatureIconCheck signatureInfo={sig} />
       </div>
     ));
@@ -288,108 +183,114 @@ function RepoDetails() {
       {isLoading ? (
         <Loading />
       ) : (
-        <Grid container className={classes.pageWrapper}>
-          <Grid item xs={12} md={12}>
-            <Card className={classes.cardRoot}>
-              <CardContent>
-                <Grid container className={classes.header}>
-                  <Grid item xs={12} md={8}>
-                    <Stack alignItems="center" direction={{ xs: 'column', md: 'row' }} spacing={2}>
-                      <Stack alignItems="center" sx={{ width: { xs: '100%', md: 'auto' } }} direction="row" spacing={2}>
-                        <CardMedia
-                          classes={{
-                            root: classes.media,
-                            img: classes.avatar
-                          }}
-                          component="img"
-                          image={placeholderImage.current}
-                          alt="icon"
-                        />
-                        <Typography variant="h4" className={classes.repoName}>
-                          {name}
-                        </Typography>
-                      </Stack>
-                      <Stack alignItems="center" sx={{ width: { xs: '100%', md: 'auto' } }} direction="row" spacing={2}>
-                        <VulnerabilityIconCheck vulnerabilitySeverity={repoDetailData?.vulnerabilitySeverity} />
-                        {getSignatureChips()}
-                      </Stack>
-                      <Stack alignItems="center" sx={{ width: { xs: '100%', md: 'auto' } }} direction="row" spacing={1}>
-                        {isAuthenticated() && (
-                          <IconButton component="span" onClick={handleStarClick} data-testid="star-button">
-                            {repoDetailData?.isStarred ? (
-                              <StarIcon data-testid="starred" />
-                            ) : (
-                              <StarBorderIcon data-testid="not-starred" />
-                            )}
-                          </IconButton>
-                        )}
-                        {isAuthenticated() && (
-                          <Stack
-                            alignItems="center"
-                            sx={{ width: { xs: '100%', md: 'auto' } }}
-                            direction="row"
-                            spacing={2}
-                          >
-                            <IconButton component="span" onClick={handleBookmarkClick} data-testid="bookmark-button">
-                              {repoDetailData?.isBookmarked ? (
-                                <BookmarkIcon data-testid="bookmarked" />
-                              ) : (
-                                <BookmarkBorderIcon data-testid="not-bookmarked" />
-                              )}
-                            </IconButton>
-                          </Stack>
-                        )}
-                      </Stack>
-                    </Stack>
-                    <Typography gutterBottom className={classes.repoTitle}>
-                      {repoDetailData?.title || 'Title not available'}
-                    </Typography>
-                    <Stack direction="row" spacing={1} className={classes.platformChipsContainer}>
-                      {platformChips()}
-                    </Stack>
-                    <Stack alignItems="center" direction="row" spacing={1} pt={'0.5rem'}>
-                      <Tooltip title={getVendor()} placement="top" className="hide-on-mobile">
-                        <Typography className={classes.vendor} variant="body2" noWrap>
-                          {<Markdown options={{ forceInline: true }}>{getVendor()}</Markdown>}
-                        </Typography>
-                      </Tooltip>
-                      <Tooltip title={getVersion()} placement="top" className="hide-on-mobile">
-                        <Typography className={classes.versionLast} variant="body2" noWrap>
-                          {getVersion()}
-                        </Typography>
-                      </Tooltip>
-                      <Tooltip title={repoDetailData.lastUpdated?.slice(0, 16) || ' '} placement="top">
-                        <Typography className={classes.versionLast} variant="body2" noWrap>
-                          {getLast()}
-                        </Typography>
-                      </Tooltip>
-                    </Stack>
-                  </Grid>
-                </Grid>
-              </CardContent>
-            </Card>
-          </Grid>
-          <Grid item xs={12} md={8} className={classes.tags}>
-            <Card className={classes.cardRoot}>
-              <CardContent className={classes.tagsContent}>
-                <Tags tags={tags} repoName={name} onTagDelete={handleDeleteTag} />
-              </CardContent>
-            </Card>
-          </Grid>
-          <Grid item xs={12} md={4} className={classes.metadata}>
-            <RepoDetailsMetadata
-              totalDownloads={repoDetailData?.downloads}
-              repoURL={repoDetailData?.source}
-              lastUpdated={repoDetailData?.lastUpdated}
-              size={repoDetailData?.size}
-              latestTag={repoDetailData?.newestTag}
-              license={repoDetailData?.license}
-              description={repoDetailData?.description}
-            />
-          </Grid>
-        </Grid>
+        <div className="w-full flex flex-col gap-6 text-left">
+          {/* Main Info Card */}
+          <div className="bg-[#111827] border border-slate-800/80 rounded-2xl p-6 md:p-8 shadow-xl flex flex-col gap-4">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div className="flex items-center gap-4">
+                <img
+                  src={placeholderImage.current}
+                  alt="icon"
+                  className="w-8 h-8 object-contain rounded"
+                />
+                <h1 className="text-3xl font-extrabold text-white tracking-tight">
+                  {name}
+                </h1>
+              </div>
+
+              {/* Status and Action Buttons */}
+              <div className="flex items-center gap-3 flex-wrap">
+                <div className="flex items-center gap-2">
+                  <VulnerabilityIconCheck vulnerabilitySeverity={repoDetailData?.vulnerabilitySeverity} />
+                  {getSignatureChips()}
+                </div>
+
+                <div className="h-6 w-px bg-slate-800 hidden sm:block" />
+
+                <div className="flex items-center gap-1.5">
+                  {isAuthenticated() && (
+                    <button
+                      onClick={handleStarClick}
+                      className="p-2 text-slate-400 hover:text-amber-500 hover:bg-slate-800/60 rounded-lg transition duration-150 cursor-pointer focus:outline-none"
+                      data-testid="star-button"
+                      aria-label="Star repository"
+                    >
+                      {repoDetailData?.isStarred ? (
+                        <Star className="w-5 h-5 text-amber-500 fill-amber-500" data-testid="starred" />
+                      ) : (
+                        <Star className="w-5 h-5" data-testid="not-starred" />
+                      )}
+                    </button>
+                  )}
+
+                  {isAuthenticated() && (
+                    <button
+                      onClick={handleBookmarkClick}
+                      className="p-2 text-slate-400 hover:text-blue-400 hover:bg-slate-800/60 rounded-lg transition duration-150 cursor-pointer focus:outline-none"
+                      data-testid="bookmark-button"
+                      aria-label="Bookmark repository"
+                    >
+                      {repoDetailData?.isBookmarked ? (
+                        <Bookmark className="w-5 h-5 text-blue-500 fill-blue-500" data-testid="bookmarked" />
+                      ) : (
+                        <Bookmark className="w-5 h-5" data-testid="not-bookmarked" />
+                      )}
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Repo Subtitle/Title */}
+            <p className="text-slate-400 text-sm">
+              {repoDetailData?.title || 'Title not available'}
+            </p>
+
+            {/* Platform tag list */}
+            <div className="flex flex-wrap items-center gap-2">
+              {platformChips()}
+            </div>
+
+            {/* Detail row */}
+            <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500 pt-2 border-t border-slate-800/40">
+              <Tooltip title={getVendor()}>
+                <span className="cursor-help">
+                  <Markdown options={{ forceInline: true }}>{getVendor()}</Markdown>
+                </span>
+              </Tooltip>
+              <Tooltip title={getVersion()}>
+                <span className="cursor-help">{getVersion()}</span>
+              </Tooltip>
+              <Tooltip title={repoDetailData.lastUpdated?.slice(0, 16) || ' '}>
+                <span className="cursor-help">{getLast()}</span>
+              </Tooltip>
+            </div>
+          </div>
+
+          {/* Grid Layout for Tags and Metadata */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
+            {/* Tags (left 2 cols) */}
+            <div className="md:col-span-2 bg-[#111827] border border-slate-800/80 rounded-2xl p-6 shadow-xl">
+              <Tags tags={tags} repoName={name} onTagDelete={handleDeleteTag} />
+            </div>
+
+            {/* Metadata (right 1 col) */}
+            <div className="md:col-span-1">
+              <RepoDetailsMetadata
+                totalDownloads={repoDetailData?.downloads}
+                repoURL={repoDetailData?.source}
+                lastUpdated={repoDetailData?.lastUpdated}
+                size={repoDetailData?.size}
+                latestTag={repoDetailData?.newestTag}
+                license={repoDetailData?.license}
+                description={repoDetailData?.description}
+              />
+            </div>
+          </div>
+        </div>
       )}
     </>
   );
 }
+
 export default RepoDetails;

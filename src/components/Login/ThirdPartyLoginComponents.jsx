@@ -1,93 +1,49 @@
 import React from 'react';
-
-import Button from '@mui/material/Button';
-import SvgIcon from '@mui/material/SvgIcon';
 import githubLogo from '../../assets/GhIcon.svg';
 
-// styling
-import { makeStyles } from '@mui/styles';
-
-const useStyles = makeStyles(() => ({
-  githubButton: {
-    textTransform: 'none',
-    background: '#161614',
-    color: '#FFFFFF',
-    borderRadius: '0.25rem',
-    padding: 0,
-    height: '3.125rem',
-    boxShadow: 'none',
-    '&:hover': {
-      backgroundColor: '#161614',
-      boxShadow: 'none'
-    }
-  },
-  googleButton: {
-    textTransform: 'none',
-    background: '#FFFFFF',
-    color: '#52637A',
-    borderRadius: '0.25rem',
-    border: '1px solid #52637A',
-    padding: 0,
-    height: '3.125rem',
-    boxShadow: 'none',
-    '&:hover': {
-      backgroundColor: '#FFFFFF',
-      boxShadow: 'none'
-    }
-  },
-  buttonsText: {
-    lineHeight: '2.125rem',
-    height: '2.125rem',
-    fontSize: '1.438rem',
-    fontWeight: '600',
-    letterSpacing: '0.01rem'
-  }
-}));
-
 function GithubLoginButton({ handleClick }) {
-  const classes = useStyles();
-
   return (
-    <Button
-      fullWidth
-      variant="contained"
-      className={classes.githubButton}
-      endIcon={<SvgIcon fontSize="medium">{githubLogo}</SvgIcon>}
+    <button
+      className="w-full bg-[#24292e] text-white hover:bg-[#2c3137] transition font-semibold rounded-md py-3 px-4 flex items-center justify-center gap-2 cursor-pointer shadow-sm text-lg"
       onClick={(e) => handleClick(e, 'github')}
     >
-      <span className={classes.buttonsText}>Continue with Github</span>
-    </Button>
+      <span>Continue with GitHub</span>
+      <img src={githubLogo} className="w-5 h-5 invert" alt="GitHub icon" />
+    </button>
   );
 }
 
 function GoogleLoginButton({ handleClick }) {
-  const classes = useStyles();
-
   return (
-    <Button fullWidth variant="contained" className={classes.googleButton} onClick={(e) => handleClick(e, 'google')}>
-      <span className={classes.buttonsText}>Continue with Google</span>
-    </Button>
+    <button
+      className="w-full bg-white text-[#374151] hover:bg-gray-50 border border-gray-300 transition font-semibold rounded-md py-3 px-4 flex items-center justify-center gap-2 cursor-pointer shadow-sm text-lg"
+      onClick={(e) => handleClick(e, 'google')}
+    >
+      <span>Continue with Google</span>
+    </button>
   );
 }
 
 function GitlabLoginButton({ handleClick }) {
-  const classes = useStyles();
-
   return (
-    <Button fullWidth variant="contained" className={classes.button} onClick={(e) => handleClick(e, 'gitlab')}>
-      Sign in with Gitlab
-    </Button>
+    <button
+      className="w-full bg-[#fc6d26] text-white hover:bg-[#e24329] transition font-semibold rounded-md py-3 px-4 flex items-center justify-center gap-2 cursor-pointer shadow-sm text-lg"
+      onClick={(e) => handleClick(e, 'gitlab')}
+    >
+      Sign in with GitLab
+    </button>
   );
 }
 
 function OIDCLoginButton({ handleClick, oidcName }) {
-  const classes = useStyles();
   const loginWithName = oidcName || 'OIDC';
-
   return (
-    <Button fullWidth variant="contained" className={classes.button} onClick={(e) => handleClick(e, 'oidc')}>
+    <button
+      className="w-full bg-blue-600 text-white hover:bg-blue-700 transition font-semibold rounded-md py-3 px-4 flex items-center justify-center gap-2 cursor-pointer shadow-sm text-lg"
+      onClick={(e) => handleClick(e, 'oidc')}
+    >
       Sign in with {loginWithName}
-    </Button>
+    </button>
   );
 }
 

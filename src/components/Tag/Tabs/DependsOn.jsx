@@ -5,32 +5,15 @@ import { isEmpty } from 'lodash';
 import { api, endpoints } from '../../../api';
 
 // components
-import { Typography, Stack } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
 import { host } from '../../../host';
 import Loading from '../../Shared/Loading';
 import TagCard from '../../Shared/TagCard';
 import { mapToImage } from 'utilities/objectModels';
 import { EXPLORE_PAGE_SIZE } from 'utilities/paginationConstants';
 
-const useStyles = makeStyles(() => ({
-  title: {
-    marginBottom: '1.7rem',
-    color: 'rgba(0, 0, 0, 0.87)',
-    fontSize: '1.5rem',
-    fontWeight: '600'
-  },
-  none: {
-    color: '#52637A',
-    fontSize: '1.4rem',
-    fontWeight: '600'
-  }
-}));
-
 function DependsOn(props) {
   const [images, setImages] = useState([]);
   const { name } = props;
-  const classes = useStyles();
   const [isLoading, setIsLoading] = useState(true);
   const abortController = useMemo(() => new AbortController(), []);
 
@@ -74,7 +57,7 @@ function DependsOn(props) {
     };
   }, [pageNumber]);
 
-  // setup intersection obeserver for infinite scroll
+  // setup intersection observer for infinite scroll
   useEffect(() => {
     if (isLoading || isEndOfList) return;
     const handleIntersection = (entries) => {
@@ -115,7 +98,7 @@ function DependsOn(props) {
         );
       })
     ) : (
-      <div>{!isLoading && <Typography className={classes.none}> Nothing found </Typography>}</div>
+      <div>{!isLoading && <div className="text-slate-400 font-medium py-6 text-center"> Nothing found </div>}</div>
     );
   };
 
@@ -124,22 +107,20 @@ function DependsOn(props) {
       return <Loading />;
     }
     if (!isLoading && !isEndOfList) {
-      return <div ref={listBottom} />;
+      return <div ref={listBottom} className="h-4" />;
     }
     return '';
   };
 
   return (
-    <div data-testid="depends-on-container">
-      <Typography variant="h4" gutterBottom component="div" align="left" className={classes.title}>
+    <div data-testid="depends-on-container" className="flex flex-col gap-4 text-left">
+      <h2 className="text-xl font-bold text-white tracking-tight border-b border-slate-800 pb-3 mb-2">
         Uses
-      </Typography>
-      <Stack direction="column" spacing={2}>
-        <Stack direction="column" spacing={2}>
-          {renderDependencies()}
-          {renderListBottom()}
-        </Stack>
-      </Stack>
+      </h2>
+      <div className="flex flex-col gap-3">
+        {renderDependencies()}
+        {renderListBottom()}
+      </div>
     </div>
   );
 }

@@ -1,7 +1,3 @@
-import { Avatar, InputBase, List, ListItem, Stack, Typography } from '@mui/material';
-import { makeStyles } from '@mui/styles';
-import PhotoIcon from '@mui/icons-material/Photo';
-import SearchIcon from '@mui/icons-material/Search';
 import React, { useEffect, useMemo, useState } from 'react';
 import { api, endpoints } from 'api';
 import { host } from 'host';
@@ -10,102 +6,7 @@ import { createSearchParams, useNavigate, useSearchParams } from 'react-router';
 import { debounce, isEmpty } from 'lodash';
 import { useCombobox } from 'downshift';
 import { HEADER_SEARCH_PAGE_SIZE } from 'utilities/paginationConstants';
-
-const useStyles = makeStyles(() => ({
-  searchContainer: {
-    display: 'inline-block',
-    backgroundColor: '#2B3A4E',
-    boxShadow: '0 0.313rem 0.625rem rgba(131, 131, 131, 0.08)',
-    borderRadius: '0.625rem',
-    minWidth: '100%',
-    position: 'relative',
-    zIndex: 1150
-  },
-  searchContainerFocused: {
-    backgroundColor: '#FFFFFF'
-  },
-  search: {
-    position: 'relative',
-    flexDirection: 'row',
-    boxShadow: '0rem 0.3125rem 0.625rem rgba(131, 131, 131, 0.08)',
-    border: '0.063rem solid #8A96A8',
-    borderRadius: '0.625rem',
-    zIndex: 1155
-  },
-  searchFocused: {
-    border: '0.125rem solid #E0E5EB',
-    backgroundColor: '#FFFFF'
-  },
-  searchFailed: {
-    border: '0.125rem solid #ff0303'
-  },
-  resultsWrapper: {
-    margin: '0',
-    marginTop: '-5%',
-    paddingTop: '5%',
-    position: 'absolute',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#2B3A4E',
-    boxShadow: '0rem 0.3125rem 0.625rem rgba(131, 131, 131, 0.08)',
-    borderBottomLeftRadius: '0.625rem',
-    borderBottomRightRadius: '0.625rem',
-    // border: '0.125rem solid #E7E7E7',
-    borderTop: 0,
-    width: '100%',
-    overflowY: 'auto',
-    zIndex: 1
-  },
-  resultsWrapperFocused: {
-    backgroundColor: '#FFFFFF'
-  },
-  resultsWrapperHidden: {
-    display: 'none'
-  },
-  searchIcon: {
-    color: '#52637A',
-    paddingRight: '3%',
-    cursor: 'pointer'
-  },
-  input: {
-    marginLeft: 1,
-    width: '90%',
-    paddingLeft: 10,
-    height: '40px',
-    fontSize: '1rem',
-    backgroundColor: '#2B3A4E',
-    borderRadius: '0.625rem',
-    color: '#8A96A8'
-  },
-  inputFocused: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: '0.625rem',
-    color: 'rgba(0, 0, 0, 0.6);'
-  },
-  searchItem: {
-    alignItems: 'center',
-    justifyContent: 'flex-start',
-    color: '#000000',
-    height: '2.75rem',
-    padding: '0 5%',
-    cursor: 'pointer'
-  },
-  searchItemIconBg: {
-    backgroundColor: '#FFFFFF',
-    height: '1.5rem',
-    width: '1.5rem',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    overflow: 'hidden'
-  },
-  searchItemIcon: {
-    color: '#0000008A',
-    minHeight: '100%',
-    minWidth: '100%',
-    objectFit: 'fill'
-  }
-}));
+import { Search, Image as ImageIcon } from 'lucide-react';
 
 function SearchSuggestion({ setSearchCurrentValue = () => {} }) {
   const [searchQuery, setSearchQuery] = useState('');
@@ -117,8 +18,6 @@ function SearchSuggestion({ setSearchCurrentValue = () => {} }) {
   const [isComponentFocused, setIsComponentFocused] = useState(false);
   const navigate = useNavigate();
   const abortController = useMemo(() => new AbortController(), []);
-
-  const classes = useStyles();
 
   const handleSuggestionSelected = (event) => {
     const name = event.selectedItem?.name;
@@ -192,8 +91,6 @@ function SearchSuggestion({ setSearchCurrentValue = () => {} }) {
   const handleSeachChange = (event) => {
     const value = event?.inputValue;
     setSearchQuery(value);
-    // used to lift up the state for pages that need to know the current value of the search input (currently only Explore) not used in other cases
-    // one way binding, other components shouldn't set the value of the search input, but using this prop can read it
     setSearchCurrentValue(value);
     setIsFailedSearch(false);
     setIsLoading(true);
@@ -202,7 +99,6 @@ function SearchSuggestion({ setSearchCurrentValue = () => {} }) {
 
   const searchCall = (value) => {
     if (value !== '') {
-      // if search term inclused the ':' character, search for images, if not, search repos
       if (value?.includes(':')) {
         imageSearch(value);
       } else {
@@ -227,7 +123,6 @@ function SearchSuggestion({ setSearchCurrentValue = () => {} }) {
   }, []);
 
   const {
-    // selectedItem,
     inputValue,
     getInputProps,
     getMenuProps,
@@ -250,104 +145,88 @@ function SearchSuggestion({ setSearchCurrentValue = () => {} }) {
 
   const renderSuggestions = () => {
     return suggestionData.map((suggestion, index) => (
-      <ListItem
+      <li
         key={`${suggestion.name}_${index}`}
-        className={classes.searchItem}
-        style={highlightedIndex === index ? { backgroundColor: '#F6F7F9' } : {}}
+        className={`flex items-center gap-3 py-2.5 px-4 cursor-pointer transition-colors duration-150 ${
+          highlightedIndex === index ? 'bg-slate-700 text-white' : 'text-slate-300 hover:bg-slate-800'
+        }`}
         {...getItemProps({ item: suggestion, index })}
-        spacing={2}
       >
-        <Stack direction="row" spacing={2}>
-          <Avatar
-            variant="square"
-            classes={{
-              root: classes.searchItemIconBg,
-              img: classes.searchItemIcon
-            }}
-            src={suggestion.logo ? `data:image/png;base64, ${suggestion.logo}` : ''}
-          >
-            <PhotoIcon className={classes.searchItemIcon} />
-          </Avatar>
-          <Typography>{suggestion.name}</Typography>
-        </Stack>
-      </ListItem>
+        <div className="flex items-center justify-center w-8 h-8 rounded bg-slate-900 overflow-hidden shrink-0 border border-slate-700">
+          {suggestion.logo ? (
+            <img
+              src={`data:image/png;base64, ${suggestion.logo}`}
+              alt="logo"
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <ImageIcon className="w-4 h-4 text-slate-400" />
+          )}
+        </div>
+        <span className="font-medium truncate text-sm">{suggestion.name}</span>
+      </li>
     ));
   };
 
   return (
-    <div className={`${classes.searchContainer} ${isComponentFocused && classes.searchContainerFocused}`}>
-      <Stack
-        className={`${classes.search} ${isComponentFocused && classes.searchFocused} ${
-          isFailedSearch && !isLoading && classes.searchFailed
+    <div className="relative w-full max-w-lg z-[1150]">
+      <div
+        className={`flex items-center justify-between gap-2 border bg-slate-900/60 backdrop-blur rounded-lg px-3 py-1.5 transition-all duration-200 ${
+          isComponentFocused
+            ? 'border-blue-500 ring-2 ring-blue-500/20'
+            : isFailedSearch && !isLoading
+            ? 'border-red-500 ring-2 ring-red-500/10'
+            : 'border-slate-800 hover:border-slate-700'
         }`}
-        direction="row"
-        alignItems="center"
-        justifyContent="space-between"
-        spacing={2}
         {...getComboboxProps()}
       >
-        <InputBase
-          placeholder={'Search for content...'}
-          className={`${classes.input} ${isComponentFocused && classes.inputFocused}`}
-          sx={{ input: { '&::placeholder': { opacity: 1 } } }}
+        <input
+          placeholder="Search for content..."
+          className="w-full bg-transparent text-white placeholder-slate-500 text-sm focus:outline-none"
           onKeyUp={handleSearch}
           onFocus={() => openMenu()}
           {...getInputProps()}
         />
-        <div onClick={handleSearch} className={classes.searchIcon}>
-          <SearchIcon />
-        </div>
-      </Stack>
-      <List
+        <button
+          onClick={handleSearch}
+          className="text-slate-400 hover:text-white transition duration-150 focus:outline-none cursor-pointer"
+        >
+          <Search className="w-4 h-4" />
+        </button>
+      </div>
+
+      <ul
         {...getMenuProps()}
-        className={
-          isOpen && !isFailedSearch
-            ? `${classes.resultsWrapper} ${isComponentFocused && classes.resultsWrapperFocused}`
-            : classes.resultsWrapperHidden
-        }
+        className={`absolute top-full left-0 w-full mt-1.5 bg-slate-900 border border-slate-800 rounded-lg shadow-xl overflow-hidden max-h-60 overflow-y-auto divide-y divide-slate-800/50 ${
+          isOpen ? 'block' : 'hidden'
+        }`}
       >
         {isOpen && suggestionData?.length > 0 && renderSuggestions()}
         {isOpen && isLoading && !isEmpty(searchQuery) && isEmpty(suggestionData) && (
-          <>
-            <ListItem
-              className={classes.searchItem}
-              style={{ color: '#52637A', fontSize: '1rem', textOverflow: 'ellipsis' }}
-              {...getItemProps({ item: '', index: 0 })}
-              spacing={2}
-            >
-              <Stack direction="row" spacing={2}>
-                <Typography>Loading...</Typography>
-              </Stack>
-            </ListItem>
-          </>
+          <li
+            className="py-3 px-4 text-slate-400 text-sm animate-pulse"
+            {...getItemProps({ item: '', index: 0 })}
+          >
+            Loading...
+          </li>
         )}
         {isOpen && isEmpty(searchQuery) && isEmpty(suggestionData) && (
           <>
-            <ListItem
-              className={classes.searchItem}
-              style={{ color: '#52637A', fontSize: '1rem', textOverflow: 'ellipsis' }}
+            <li
+              className="py-2.5 px-4 text-slate-400 text-xs hover:bg-slate-800/30 select-none"
               {...getItemProps({ item: '', index: 0 })}
-              spacing={2}
-              onClick={() => {}}
             >
-              <Stack direction="row" spacing={2}>
-                <Typography>Press Enter for advanced search</Typography>
-              </Stack>
-            </ListItem>
-            <ListItem
-              className={classes.searchItem}
-              style={{ color: '#52637A', fontSize: '1rem', textOverflow: 'ellipsis' }}
-              {...getItemProps({ item: '', index: 0 })}
-              spacing={2}
-              onClick={() => {}}
+              Press Enter for advanced search
+            </li>
+            <li
+              className="py-2.5 px-4 text-slate-400 text-xs hover:bg-slate-800/30 select-none border-t border-slate-800/30"
+              {...getItemProps({ item: '', index: 1 })}
             >
-              <Stack direction="row" spacing={2}>
-                <Typography>Use the &apos;:&apos; character to search for tags</Typography>
-              </Stack>
-            </ListItem>
+              Use the ':' character to search for tags
+            </li>
           </>
         )}
-      </List>
+      </ul>
     </div>
   );
 }

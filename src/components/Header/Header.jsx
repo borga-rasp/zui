@@ -5,98 +5,24 @@ import { Link, useLocation } from 'react-router';
 import { isAuthenticated, isAuthenticationEnabled, logoutUser } from '../../utilities/authUtilities';
 
 // components
-import { AppBar, Toolbar, Grid, Button } from '@mui/material';
 import SearchSuggestion from './SearchSuggestion';
 import UserAccountMenu from './UserAccountMenu';
-// styling
-import makeStyles from '@mui/styles/makeStyles';
-import logo from '../../assets/zotLogoWhite.svg';
-import logoxs from '../../assets/zotLogoWhiteSmall.svg';
-import githubLogo from '../../assets/Git.png';
 
-const useStyles = makeStyles((theme) => ({
-  barOpen: {
-    position: 'sticky',
-    minHeight: '10%'
-  },
-  barClosed: {
-    position: 'sticky',
-    minHeight: '10%',
-    backgroundColor: 'red'
-  },
-  header: {
-    display: 'flex',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 0,
-    backgroundColor: '#0F2139',
-    height: '100%',
-    width: '100%',
-    borderBottom: '0.0625rem solid #BDBDBD',
-    boxShadow: '0rem 0.3125rem 0.625rem rgba(131, 131, 131, 0.08)'
-  },
-  headerContainer: {
-    minWidth: '60%'
-  },
-  searchIcon: {
-    color: '#52637A',
-    paddingRight: '3%'
-  },
-  input: {
-    color: '#464141',
-    marginLeft: 1,
-    width: '90%'
-  },
-
-  icons: {
-    color: '#001e44'
-  },
-  appName: {
-    marginLeft: 10,
-    marginTop: 8,
-    color: '#464141'
-  },
-  logoWrapper: {},
-  logo: {
-    maxWidth: '130px',
-    maxHeight: '30px'
-  },
-  headerLinkContainer: {
-    [theme.breakpoints.down('md')]: {
-      display: 'none'
-    }
-  },
-  link: {
-    color: '#F6F7F9',
-    fontSize: '1rem',
-    fontWeight: 600
-  },
-  grid: {
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    height: '2.875rem',
-    [theme.breakpoints.down('md')]: {
-      justifyContent: 'space-between'
-    }
-  },
-  gridItem: {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center'
-  },
-  signInBtn: {
-    border: '1px solid #F6F7F9',
-    borderRadius: '0.625rem',
-    backgroundColor: 'transparent',
-    color: '#F6F7F9',
-    fontSize: '1rem',
-    textTransform: 'none',
-    fontWeight: 600
-  }
-}));
+const GithubIcon = (props) => (
+  <svg
+    viewBox="0 0 24 24"
+    width="24"
+    height="24"
+    stroke="currentColor"
+    strokeWidth="2"
+    fill="none"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={props.className}
+  >
+    <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22" />
+  </svg>
+);
 
 function setNavShow() {
   const [show, setShow] = useState(true);
@@ -104,20 +30,23 @@ function setNavShow() {
 
   const controlNavbar = () => {
     if (typeof window !== 'undefined') {
-      if (window.scrollY < lastScrollY) {
+      const currentScrollY = window.scrollY;
+      if (currentScrollY <= 50) {
         setShow(true);
-      } else {
-        setShow(false);
+      } else if (lastScrollY !== null) {
+        if (currentScrollY < lastScrollY) {
+          setShow(true);
+        } else {
+          setShow(false);
+        }
       }
-
-      setLastScrollY(window.scrollY);
+      setLastScrollY(currentScrollY);
     }
   };
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
       window.addEventListener('scroll', controlNavbar);
-
       return () => {
         window.removeEventListener('scroll', controlNavbar);
       };
@@ -128,7 +57,6 @@ function setNavShow() {
 
 function Header({ setSearchCurrentValue = () => {} }) {
   const show = setNavShow();
-  const classes = useStyles();
   const path = useLocation().pathname;
 
   const handleSignInClick = () => {
@@ -136,59 +64,63 @@ function Header({ setSearchCurrentValue = () => {} }) {
   };
 
   return (
-    <AppBar position={show ? 'fixed' : 'absolute'} sx={{ height: '5rem' }}>
-      <Toolbar className={classes.header}>
-        <Grid container className={classes.grid}>
-          <Grid item container xs={3} md={4} spacing="1.5rem" className={classes.gridItem}>
-            <Grid item>
-              <Link to="/home">
-                <picture>
-                  <source media="(min-width:600px)" srcSet={logo} />
-                  <img alt="zot" src={logoxs} className={classes.logo} />
-                </picture>
-              </Link>
-            </Grid>
-            <Grid item className={classes.headerLinkContainer}>
-              <a className={classes.link} href="https://zotregistry.dev" target="_blank" rel="noreferrer">
-                Product
-              </a>
-            </Grid>
-            <Grid item className={classes.headerLinkContainer}>
-              <a
-                className={classes.link}
-                href="https://zotregistry.dev/v2.0.0/general/concepts/"
-                target="_blank"
-                rel="noreferrer"
-              >
-                Docs
-              </a>
-            </Grid>
-          </Grid>
-          <Grid item xs={6} md={4} className={classes.gridItem}>
-            {path !== '/' && <SearchSuggestion setSearchCurrentValue={setSearchCurrentValue} />}
-          </Grid>
-          <Grid item container xs={2} md={3} spacing="1.5rem" className={`${classes.gridItem}`}>
-            <Grid item className={classes.headerLinkContainer}>
-              <a className={classes.link} href="https://github.com/project-zot/zot" target="_blank" rel="noreferrer">
-                <img alt="github repository" src={githubLogo} className={classes.logo} />
-              </a>
-            </Grid>
-            {isAuthenticated() && isAuthenticationEnabled() && (
-              <Grid item>
-                <UserAccountMenu />
-              </Grid>
-            )}
-            {!isAuthenticated() && isAuthenticationEnabled() && (
-              <Grid item>
-                <Button className={classes.signInBtn} onClick={handleSignInClick}>
-                  Sign in
-                </Button>
-              </Grid>
-            )}
-          </Grid>
-        </Grid>
-      </Toolbar>
-    </AppBar>
+    <header
+      className={`fixed top-0 left-0 w-full h-16 bg-[#0b0f19]/80 backdrop-blur-md border-b border-slate-800 z-[1000] transition-transform duration-300 ${
+        show ? 'translate-y-0' : '-translate-y-full'
+      }`}
+    >
+      <div className="max-w-7xl mx-auto h-full px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-4">
+        {/* Left: Branding & Links */}
+        <div className="flex items-center gap-6 md:gap-8">
+          <Link to="/home" className="flex items-center gap-2 group shrink-0">
+            <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-gradient-to-tr from-blue-600 to-indigo-600 shadow shadow-indigo-500/20 group-hover:scale-105 transition duration-200">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5 text-white">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zM4 19.235v-.11a6.375 6.375 0 0112.75 0v.109A12.318 12.318 0 0110.374 21c-2.331 0-4.512-.645-6.374-1.766z" />
+              </svg>
+            </div>
+            <div className="flex flex-col items-start leading-none">
+              <span className="font-extrabold tracking-tight text-white text-lg bg-gradient-to-r from-blue-400 to-indigo-300 bg-clip-text text-transparent">
+                BORGA
+              </span>
+              <span className="text-[9px] uppercase tracking-widest text-slate-400 font-semibold">
+                Registry
+              </span>
+            </div>
+          </Link>
+        </div>
+
+        {/* Center: Search */}
+        <div className="flex-1 max-w-md">
+          {path !== '/' && <SearchSuggestion setSearchCurrentValue={setSearchCurrentValue} />}
+        </div>
+
+        {/* Right: GitHub & User Profile */}
+        <div className="flex items-center gap-4">
+          <a
+            className="text-slate-400 hover:text-white transition duration-150 p-1.5 hover:bg-slate-800 rounded-lg"
+            href="https://github.com/project-zot/zot"
+            target="_blank"
+            rel="noreferrer"
+            aria-label="GitHub Repository"
+          >
+            <GithubIcon className="w-5 h-5" />
+          </a>
+
+          {isAuthenticated() && isAuthenticationEnabled() && (
+            <UserAccountMenu />
+          )}
+
+          {!isAuthenticated() && isAuthenticationEnabled() && (
+            <button
+              onClick={handleSignInClick}
+              className="bg-transparent border border-slate-700 hover:border-slate-500 text-slate-200 hover:text-white text-sm font-semibold py-1.5 px-4 rounded-lg transition duration-200 cursor-pointer"
+            >
+              Sign in
+            </button>
+          )}
+        </div>
+      </div>
+    </header>
   );
 }
 

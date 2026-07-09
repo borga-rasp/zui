@@ -4,12 +4,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 // components
 import RepoCard from '../Shared/RepoCard.jsx';
 import Loading from '../Shared/Loading';
-import Typography from '@mui/material/Typography';
 import Sticky from 'react-sticky-el';
-import Alert from '@mui/material/Alert';
-import { Container, FormControl, Grid, InputLabel, MenuItem, Select, Stack, Button } from '@mui/material';
-
-import makeStyles from '@mui/styles/makeStyles';
 
 // utility
 import { api, endpoints } from '../../api';
@@ -23,45 +18,58 @@ import { sortByCriteria } from 'utilities/sortCriteria.js';
 import { EXPLORE_PAGE_SIZE } from 'utilities/paginationConstants.js';
 import FilterDialog from './FilterDialog.jsx';
 
-const useStyles = makeStyles((theme) => ({
-  gridWrapper: {
-    paddingTop: '2rem',
-    paddingBottom: '2rem'
-  },
-  nodataWrapper: {
-    backgroundColor: '#fff',
-    height: '100vh',
-    justifyContent: 'center',
-    alignItems: 'center'
-  },
-  resultsRow: {
-    justifyContent: 'space-between',
-    alignItems: 'center'
-  },
-  results: {
-    marginLeft: '1rem',
-    color: theme.palette.secondary.dark
-  },
-  sortForm: {
-    backgroundColor: '#ffffff',
-    borderColor: '#E0E0E0',
-    borderRadius: '0.375em',
-    width: '23%',
-    textAlign: 'left'
-  },
-  filterButton: {
-    borderRadius: '0.4rem',
-    marginBottom: '1rem',
-    [theme.breakpoints.up('md')]: {
-      display: 'none'
+// Custom Select Component to match MUI tests expectations but using Tailwind
+const CustomSelect = ({ value, onChange, options, disabled }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef(null);
+  
+  const selectedOption = Object.values(options).find((o) => o.value === value) || Object.values(options)[0];
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
     }
-  },
-  filterCardsContainer: {
-    [theme.breakpoints.down('md')]: {
-      display: 'none'
-    }
-  }
-}));
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  return (
+    <div className="relative w-full max-w-[200px]" ref={dropdownRef}>
+      <button
+        type="button"
+        disabled={disabled}
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full flex items-center justify-between bg-slate-900 border border-slate-800 hover:border-slate-700 disabled:opacity-50 text-slate-200 hover:text-white rounded-lg py-2 px-3 text-sm focus:outline-none focus:border-blue-500 transition duration-150 cursor-pointer text-left"
+      >
+        <span>{selectedOption?.label}</span>
+        <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+      {isOpen && !disabled && (
+        <div className="absolute right-0 mt-1 w-full bg-slate-900 border border-slate-800 rounded-lg shadow-xl py-1 z-50 max-h-60 overflow-y-auto">
+          {Object.values(options).map((option) => (
+            <button
+              key={option.value}
+              type="button"
+              onClick={() => {
+                onChange({ target: { value: option.value } });
+                setIsOpen(false);
+              }}
+              className={`w-full text-left px-4 py-2.5 text-sm transition cursor-pointer ${
+                option.value === value ? 'bg-blue-600 text-white font-semibold' : 'text-slate-350 hover:bg-slate-800 hover:text-white'
+              }`}
+            >
+              {option.label}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
 
 function Explore({ searchInputValue }) {
   const [isLoading, setIsLoading] = useState(true);
@@ -69,17 +77,18 @@ function Explore({ searchInputValue }) {
   const [sortFilter, setSortFilter] = useState(sortByCriteria.relevance.value);
   const [queryParams] = useSearchParams();
   const search = queryParams.get('search');
+  
   // filtercard filters
   const [imageFilters, setImageFilters] = useState({});
   const [osFilters, setOSFilters] = useState([]);
   const [archFilters, setArchFilters] = useState([]);
+  
   // pagination props
   const [pageNumber, setPageNumber] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
   const [isEndOfList, setIsEndOfList] = useState(false);
   const listBottom = useRef(null);
   const abortController = useMemo(() => new AbortController(), []);
-  const classes = useStyles();
 
   // Filterdialog props
   const [filterDialogOpen, setFilterDialogOpen] = useState(false);
@@ -116,7 +125,8 @@ function Explore({ searchInputValue }) {
     }
   };
 
-  const getPaginatedResults = () => {
+  useEffect(() => {
+    let isCurrent = true;
     setIsLoading(true);
     api
       .get(
@@ -130,6 +140,7 @@ function Explore({ searchInputValue }) {
         abortController.signal
       )
       .then((response) => {
+        if (!isCurrent) return;
         if (response.data && response.data.data) {
           let repoList = response.data.data.GlobalSearch.Repos;
           let repoData = repoList.map((responseRepo) => {
@@ -137,47 +148,35 @@ function Explore({ searchInputValue }) {
           });
           setTotalItems(response.data.data.GlobalSearch.Page?.TotalCount);
           setIsEndOfList(response.data.data.GlobalSearch.Page?.ItemCount < EXPLORE_PAGE_SIZE);
-          setExploreData((previousState) => [...previousState, ...repoData]);
+          if (pageNumber === 1) {
+            setExploreData(repoData);
+          } else {
+            setExploreData((previousState) => [...previousState, ...repoData]);
+          }
         }
         setIsLoading(false);
       })
       .catch((e) => {
+        if (!isCurrent) return;
         console.error(e);
         setIsLoading(false);
         setIsEndOfList(true);
       });
-  };
+    return () => {
+      isCurrent = false;
+      abortController.abort();
+    };
+  }, [pageNumber, search, imageFilters, osFilters, archFilters, sortFilter]);
 
-  const resetPagination = async () => {
-    setIsEndOfList(false);
-    setExploreData([]);
-    if (pageNumber !== 1) {
-      setPageNumber(1);
-    } else {
-      getPaginatedResults();
-    }
-  };
-
-  // if filters changed, reset pagination and restart lookup
   useEffect(() => {
-    if (isLoading) return;
-    resetPagination();
+    setPageNumber(1);
   }, [search, imageFilters, osFilters, archFilters, sortFilter]);
 
-  // on component mount or when query params change, check query params for filters
   useEffect(() => {
     if (isLoading) return;
     deconstructFilterQuery();
   }, [queryParams, isLoading]);
 
-  useEffect(() => {
-    getPaginatedResults();
-    return () => {
-      abortController.abort();
-    };
-  }, [pageNumber]);
-
-  // setup intersection obeserver for infinite scroll
   useEffect(() => {
     if (isLoading || isEndOfList) return;
     const handleIntersection = (entries) => {
@@ -212,36 +211,38 @@ function Explore({ searchInputValue }) {
 
   const renderRepoCards = () => {
     return (
-      exploreData &&
-      exploreData.map((item, index) => {
-        return (
-          <RepoCard
-            name={item.name}
-            version={item.latestVersion}
-            description={item.description}
-            downloads={item.downloads}
-            stars={item.stars}
-            signatureInfo={item.signatureInfo}
-            isBookmarked={item.isBookmarked}
-            isStarred={item.isStarred}
-            vendor={item.vendor}
-            platforms={item.platforms}
-            key={index}
-            vulnerabilityData={{
-              vulnerabilitySeverity: item.vulnerabiltySeverity,
-              count: item.vulnerabilityCount
-            }}
-            lastUpdated={item.lastUpdated}
-            logo={item.logo}
-          />
-        );
-      })
+      <div className="flex flex-col gap-4">
+        {exploreData &&
+          exploreData.map((item, index) => {
+            return (
+              <RepoCard
+                name={item.name}
+                version={item.latestVersion}
+                description={item.description}
+                downloads={item.downloads}
+                stars={item.stars}
+                signatureInfo={item.signatureInfo}
+                isBookmarked={item.isBookmarked}
+                isStarred={item.isStarred}
+                vendor={item.vendor}
+                platforms={item.platforms}
+                key={index}
+                vulnerabilityData={{
+                  vulnerabilitySeverity: item.vulnerabiltySeverity,
+                  count: item.vulnerabilityCount
+                }}
+                lastUpdated={item.lastUpdated}
+                logo={item.logo}
+              />
+            );
+          })}
+      </div>
     );
   };
 
   const renderFilterCards = () => {
     return (
-      <Stack spacing={2}>
+      <div className="flex flex-col gap-4">
         <FilterCard
           title="Operating system"
           filters={filterConstants.osFilters}
@@ -263,7 +264,7 @@ function Explore({ searchInputValue }) {
           updateFilters={setImageFilters}
           wrapperLoading={isLoading}
         />
-      </Stack>
+      </div>
     );
   };
 
@@ -272,71 +273,63 @@ function Explore({ searchInputValue }) {
       return filterDialogOpen ? <div /> : <Loading />;
     }
     if (!isLoading && !isEndOfList) {
-      return <div ref={listBottom} />;
+      return <div ref={listBottom} className="h-4" />;
     }
-    return;
+    return null;
   };
 
   return (
-    <Container maxWidth="lg">
-      <Grid container className={classes.gridWrapper}>
-        <Grid container item xs={12}>
-          <Grid item xs={3} className="hide-on-mobile"></Grid>
-          <Grid item xs={12} md={9}>
-            <Stack direction="row" className={classes.resultsRow}>
-              <Typography variant="body2" className={`${classes.results} hide-on-mobile`}>
-                Showing {exploreData?.length} results out of {totalItems}
-              </Typography>
-              {!isLoading && (
-                <Button variant="contained" onClick={handleFilterDialogOpen} className={`${classes.filterButton}`}>
-                  Filter results
-                </Button>
-              )}
-              <FormControl
-                sx={{ minWidth: '4.6875rem' }}
-                disabled={isLoading}
-                className={`${classes.sortForm} hide-on-mobile`}
-                size="small"
-              >
-                <InputLabel>Sort</InputLabel>
-                <Select
-                  label="Sort"
-                  value={sortFilter}
-                  onChange={handleSortChange}
-                  MenuProps={{ disableScrollLock: true }}
-                >
-                  {Object.values(sortByCriteria).map((el) => (
-                    <MenuItem key={el.value} value={el.value}>
-                      {el.label}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Stack>
-          </Grid>
-        </Grid>
-        <Grid container item xs={12} spacing={5} pt={1}>
-          <Grid item xs={3} md={3} className={classes.filterCardsContainer}>
-            <Sticky>{renderFilterCards()}</Sticky>
-          </Grid>
-          <Grid item xs={12} md={9}>
-            {!(exploreData && exploreData.length) && !isLoading ? (
-              <Grid container className={classes.nodataWrapper}>
-                <div style={{ marginTop: 20 }}>
-                  <Alert style={{ marginTop: 10 }} variant="outlined" severity="warning">
-                    Looks like we don&apos;t have anything matching that search. Try searching something else.
-                  </Alert>
-                </div>
-              </Grid>
-            ) : (
-              <Stack direction="column">
-                {renderRepoCards()}
-                {renderListBottom()}
-              </Stack>
-            )}
-          </Grid>
-        </Grid>
-      </Grid>
+    <div className="w-full">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-800 pb-4 mb-6">
+        <span className="text-sm font-semibold text-slate-400 hidden md:block">
+          Showing {exploreData?.length} results out of {totalItems}
+        </span>
+        
+        {!isLoading && (
+          <button
+            onClick={handleFilterDialogOpen}
+            className="md:hidden w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-150 cursor-pointer"
+          >
+            Filter results
+          </button>
+        )}
+
+        <div className="hidden md:flex items-center gap-2 self-end">
+          <span className="text-sm font-semibold text-slate-400 mr-2">Sort By</span>
+          <CustomSelect
+            options={sortByCriteria}
+            value={sortFilter}
+            onChange={handleSortChange}
+            disabled={isLoading}
+          />
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        {/* Left column: Sticky filters */}
+        <aside className="hidden md:block md:col-span-1">
+          <Sticky stickyClassName="sticky-wrapper" topOffset={-80}>
+            <div className="space-y-4">
+              {renderFilterCards()}
+            </div>
+          </Sticky>
+        </aside>
+
+        {/* Right column: Results list */}
+        <div className="col-span-1 md:col-span-3">
+          {!(exploreData && exploreData.length) && !isLoading ? (
+            <div className="bg-amber-500/10 border border-amber-500/20 text-amber-400 text-sm rounded-xl p-4 text-left">
+              Looks like we don't have anything matching that search. Try searching something else.
+            </div>
+          ) : (
+            <div className="flex flex-col">
+              {renderRepoCards()}
+              {renderListBottom()}
+            </div>
+          )}
+        </div>
+      </div>
+
       <FilterDialog
         open={filterDialogOpen}
         setOpen={setFilterDialogOpen}
@@ -344,7 +337,7 @@ function Explore({ searchInputValue }) {
         setSortValue={setSortFilter}
         renderFilterCards={renderFilterCards}
       />
-    </Container>
+    </div>
   );
 }
 

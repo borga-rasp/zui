@@ -1,54 +1,20 @@
-// react global
-import React from 'react';
-
 // components
-
-import makeStyles from '@mui/styles/makeStyles';
-import { Container, Grid, Stack } from '@mui/material';
+import React from 'react';
 import Header from 'components/Header/Header';
 import RepoDetails from 'components/Repo/RepoDetails';
 import ExploreHeader from 'components/Header/ExploreHeader';
 
-const useStyles = makeStyles(() => ({
-  pageWrapper: {
-    height: '100%',
-    display: 'flex',
-    flexFlow: 'column'
-  },
-  container: {
-    paddingTop: 5,
-    paddingBottom: 5,
-    display: 'flex',
-    flexFlow: 'column',
-    height: '100%'
-  },
-  parentWrapper: {
-    height: '100vh'
-  },
-  gridWrapper: {
-    backgroundColor: 'transparent',
-    width: '100%',
-    display: 'flex',
-    flexFlow: 'column',
-    height: '100%'
-  }
-}));
-
 function RepoPage() {
-  const classes = useStyles();
-
   return (
-    <Stack direction="column" className={classes.pageWrapper} data-testid="repo-container">
+    <div className="flex flex-col min-h-screen bg-[#090d16]" data-testid="repo-container">
       <Header />
-      <Container className={classes.container}>
+      <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-16 flex flex-col gap-4">
         <ExploreHeader />
-        <Grid container className={classes.gridWrapper}>
-          <Grid item xs={12}>
-            <RepoDetails />
-          </Grid>
-        </Grid>
-      </Container>
-    </Stack>
+        <div className="w-full">
+          <RepoDetails />
+        </div>
+      </main>
+    </div>
   );
 }
 

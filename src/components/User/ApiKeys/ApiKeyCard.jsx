@@ -1,97 +1,10 @@
 import React, { useState } from 'react';
-
 import { DateTime } from 'luxon';
 import { isNil } from 'lodash';
-
-import { Card, CardContent, Typography, Grid, Divider, Stack, Collapse, Button } from '@mui/material';
-import { KeyboardArrowDown, KeyboardArrowRight } from '@mui/icons-material';
+import { ChevronRight, ChevronDown } from 'lucide-react';
 import ApiKeyRevokeDialog from './ApiKeyRevokeDialog';
 
-import makeStyles from '@mui/styles/makeStyles';
-
-const useStyles = makeStyles(() => ({
-  card: {
-    marginBottom: 2,
-    display: 'flex',
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    border: '1px solid #E0E5EB',
-    borderRadius: '0.75rem',
-    alignSelf: 'stretch',
-    flexGrow: 0,
-    order: 0,
-    width: '100%'
-  },
-  content: {
-    textAlign: 'left',
-    color: '#52637A',
-    width: '100%',
-    boxSizing: 'border-box',
-    padding: '1rem',
-    backgroundColor: '#FFFFFF',
-    '&:hover': {
-      backgroundColor: '#FFFFFF'
-    },
-    '&:last-child': {
-      paddingBottom: '1rem'
-    }
-  },
-  label: {
-    fontSize: '1rem',
-    fontWeight: '400',
-    paddingRight: '0.5rem',
-    paddingBottom: '0.5rem',
-    paddingTop: '0.5rem',
-    textAlign: 'left',
-    width: '100%',
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-    cursor: 'pointer'
-  },
-  expirationDate: {
-    fontSize: '1rem',
-    fontWeight: '400',
-    paddingBottom: '0.5rem',
-    paddingTop: '0.5rem',
-    textAlign: 'right'
-  },
-  revokeButton: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'right'
-  },
-  dropdownText: {
-    color: '#1479FF',
-    fontSize: '1rem',
-    fontWeight: '600',
-    cursor: 'pointer',
-    textAlign: 'center'
-  },
-  dropdownButton: {
-    color: '#1479FF',
-    fontSize: '0.8125rem',
-    fontWeight: '600',
-    cursor: 'pointer'
-  },
-  dropdownContentBox: {
-    boxSizing: 'border-box',
-    color: '#52637A',
-    fontSize: '1rem',
-    fontWeight: '400',
-    padding: '0.75rem',
-    backgroundColor: '#F7F7F7',
-    borderRadius: '0.9rem',
-    overflowWrap: 'break-word'
-  },
-  keyCardDivider: {
-    margin: '1rem 0'
-  }
-}));
-
 function ApiKeyCard(props) {
-  const classes = useStyles();
   const { apiKey, onRevoke } = props;
   const [openDropdown, setOpenDropdown] = useState(false);
   const [apiKeyRevokeOpen, setApiKeyRevokeOpen] = useState(false);
@@ -106,57 +19,58 @@ function ApiKeyCard(props) {
   };
 
   return (
-    <Card variant="outlined" className={classes.card}>
-      <CardContent className={classes.content}>
-        <Grid container alignItems="center" justifyContent="space-between">
-          <Grid item xs={6}>
-            <Typography variant="body1" className={classes.label}>
-              {apiKey.label}
-            </Typography>
-          </Grid>
-          <Grid item xs={4}>
-            <Typography variant="body1" className={classes.expirationDate}>
-              {getExpirationDisplay()}
-            </Typography>
-          </Grid>
-          <Grid item xs={2} className={classes.revokeButton}>
-            <Button color="error" variant="contained" onClick={handleApiKeyRevokeDialogOpen}>
-              Revoke
-            </Button>
-          </Grid>
-          {!isNil(apiKey.apiKey) && (
-            <>
-              <Grid item xs={12}>
-                <Divider className={classes.keyCardDivider} />
-              </Grid>
-              <Grid item xs={12}>
-                <Stack direction="row" onClick={() => setOpenDropdown((prevOpenState) => !prevOpenState)}>
-                  {!openDropdown ? (
-                    <KeyboardArrowRight className={classes.dropdownText} />
-                  ) : (
-                    <KeyboardArrowDown className={classes.dropdownText} />
-                  )}
-                  <Typography className={classes.dropdownButton}>KEY</Typography>
-                </Stack>
-                <Collapse in={openDropdown} timeout="auto" unmountOnExit sx={{ marginTop: '1rem' }}>
-                  <Stack direction="column" spacing="1.2rem">
-                    <Typography variant="body1" align="left" className={classes.dropdownContentBox}>
-                      {apiKey.apiKey}
-                    </Typography>
-                  </Stack>
-                </Collapse>
-              </Grid>
-            </>
-          )}
-        </Grid>
-        <ApiKeyRevokeDialog
-          open={apiKeyRevokeOpen}
-          setOpen={setApiKeyRevokeOpen}
-          apiKey={apiKey}
-          onConfirm={onRevoke}
-        />
-      </CardContent>
-    </Card>
+    <div className="MuiCard-root w-full bg-slate-900/60 border border-slate-800/80 rounded-xl p-5 text-left shadow-sm">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        {/* Label & Expiration */}
+        <div className="flex-1 min-w-0">
+          <h3 className="text-base font-bold text-white truncate">
+            {apiKey.label}
+          </h3>
+          <span className="text-xs text-slate-400 block mt-1">
+            {getExpirationDisplay()}
+          </span>
+        </div>
+
+        {/* Action Button */}
+        <button
+          onClick={handleApiKeyRevokeDialogOpen}
+          className="bg-red-600 hover:bg-red-700 text-white text-xs font-semibold py-2 px-4 rounded-lg transition duration-150 cursor-pointer self-start sm:self-center focus:outline-none"
+        >
+          Revoke
+        </button>
+      </div>
+
+      {!isNil(apiKey.apiKey) && (
+        <>
+          <div className="border-t border-slate-800/60 my-4" />
+          
+          <div>
+            <button
+              onClick={() => setOpenDropdown(!openDropdown)}
+              className="flex items-center gap-1 text-xs font-bold uppercase tracking-wider text-indigo-400 hover:text-indigo-350 transition cursor-pointer focus:outline-none"
+            >
+              {openDropdown ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+              <span>Key</span>
+            </button>
+
+            {openDropdown && (
+              <div className="mt-2.5 animate-in fade-in duration-100">
+                <div className="bg-slate-950 border border-slate-800/65 rounded-lg p-3 text-xs font-mono text-slate-400 break-all select-all">
+                  {apiKey.apiKey}
+                </div>
+              </div>
+            )}
+          </div>
+        </>
+      )}
+
+      <ApiKeyRevokeDialog
+        open={apiKeyRevokeOpen}
+        setOpen={setApiKeyRevokeOpen}
+        apiKey={apiKey}
+        onConfirm={onRevoke}
+      />
+    </div>
   );
 }
 
