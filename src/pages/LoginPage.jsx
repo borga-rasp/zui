@@ -20,15 +20,15 @@ function LoginPage({ isLoggedIn, setIsLoggedIn }) {
 
       <div className={`w-full flex items-center justify-center p-4 sm:p-8 relative z-10 ${isLoading ? 'hidden' : ''}`}>
         {/* Centered Glassmorphic Modal */}
-        <div className="w-full max-w-4xl bg-white/80 dark:bg-slate-900/70 backdrop-blur-2xl border border-slate-200/60 dark:border-slate-800/80 shadow-2xl shadow-slate-200/50 dark:shadow-none rounded-[2rem] overflow-hidden flex flex-col md:flex-row">
+        <div className="w-full max-w-5xl bg-white/80 dark:bg-slate-900/70 backdrop-blur-2xl border border-slate-200/60 dark:border-slate-800/80 shadow-2xl shadow-slate-200/50 dark:shadow-none rounded-[2rem] overflow-hidden flex flex-col md:flex-row">
           
           {/* Left Side: Presentation */}
-          <div className="w-full md:w-[45%] bg-slate-50/50 dark:bg-slate-950/40 p-8 sm:p-12 border-b md:border-b-0 md:border-r border-slate-200/60 dark:border-slate-800/60 flex flex-col justify-center">
+          <div className="w-full md:w-1/2 bg-slate-50/50 dark:bg-slate-950/40 p-10 lg:p-16 border-b md:border-b-0 md:border-r border-slate-200/60 dark:border-slate-800/60 flex flex-col justify-center">
             <SigninPresentation />
           </div>
 
           {/* Right Side: Form */}
-          <div className="w-full md:w-[55%] p-8 sm:p-12 flex items-center justify-center bg-transparent">
+          <div className="w-full md:w-1/2 p-10 lg:p-16 flex items-center justify-center bg-transparent">
             <SignIn isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} wrapperSetLoading={setIsLoading} />
           </div>
 
