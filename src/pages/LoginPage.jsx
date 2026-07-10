@@ -10,28 +10,26 @@ function LoginPage({ isLoggedIn, setIsLoggedIn }) {
   const [isLoading, setIsLoading] = useState(true);
 
   return (
-    <div className="flex min-h-screen bg-bg-dark relative overflow-hidden" data-testid="login-container">
-      {/* Premium ambient background glow */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none opacity-60" />
-      <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-500/10 dark:bg-blue-600/10 rounded-full blur-3xl pointer-events-none mix-blend-multiply dark:mix-blend-lighten" />
-      <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-indigo-500/10 dark:bg-indigo-600/10 rounded-full blur-3xl pointer-events-none mix-blend-multiply dark:mix-blend-lighten" />
-
+    <div className="flex min-h-screen w-full" data-testid="login-container">
       {isLoading && <Loading />}
 
-      <div className={`w-full flex items-center justify-center p-4 sm:p-8 relative z-10 ${isLoading ? 'hidden' : ''}`}>
-        {/* Centered Glassmorphic Modal */}
-        <div className="w-full max-w-5xl bg-white/80 dark:bg-slate-900/70 backdrop-blur-2xl border border-slate-200/60 dark:border-slate-800/80 shadow-2xl shadow-slate-200/50 dark:shadow-none rounded-[2rem] overflow-hidden flex flex-col md:flex-row">
-          
-          {/* Left Side: Presentation */}
-          <div className="w-full md:w-1/2 bg-slate-50/50 dark:bg-slate-950/40 p-10 lg:p-16 border-b md:border-b-0 md:border-r border-slate-200/60 dark:border-slate-800/60 flex flex-col justify-center">
-            <SigninPresentation />
-          </div>
+      {/* Left Side: Presentation (Always Dark Theme) */}
+      <div className={`hidden lg:flex w-1/2 bg-slate-950 relative overflow-hidden flex-col justify-center items-center p-12 lg:p-24 ${isLoading ? 'hidden' : ''}`}>
+        {/* Artistic background elements */}
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] bg-[size:14px_24px] [mask-image:radial-gradient(ellipse_80%_80%_at_50%_20%,#000_70%,transparent_100%)]"></div>
+        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-blue-900/20 via-transparent to-indigo-900/20 pointer-events-none" />
+        <div className="absolute -top-32 -left-32 w-96 h-96 rounded-full bg-blue-600/20 blur-[128px] pointer-events-none" />
+        <div className="absolute -bottom-32 -right-32 w-96 h-96 rounded-full bg-indigo-600/20 blur-[128px] pointer-events-none" />
+        
+        <div className="relative z-10 w-full max-w-lg">
+          <SigninPresentation />
+        </div>
+      </div>
 
-          {/* Right Side: Form */}
-          <div className="w-full md:w-1/2 p-10 lg:p-16 flex items-center justify-center bg-transparent">
-            <SignIn isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} wrapperSetLoading={setIsLoading} />
-          </div>
-
+      {/* Right Side: Form (Adapts to system theme) */}
+      <div className={`flex w-full lg:w-1/2 flex-col justify-center items-center p-8 sm:p-16 relative bg-white dark:bg-slate-900 ${isLoading ? 'hidden' : ''}`}>
+        <div className="relative z-10 w-full max-w-md flex justify-center">
+          <SignIn isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} wrapperSetLoading={setIsLoading} />
         </div>
       </div>
     </div>
