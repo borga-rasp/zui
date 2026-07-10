@@ -1,5 +1,5 @@
 import React from 'react';
-import { Package, ShieldCheck, Zap } from 'lucide-react';
+import { Package, ShieldCheck, Layers } from 'lucide-react';
 
 export default function SigninPresentation() {
   return (
@@ -12,9 +12,8 @@ export default function SigninPresentation() {
           </div>
           <div>
             <h1 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white">
-              Borga <span className="text-blue-600 dark:text-blue-400">Rasp</span>
+              Borga <span className="text-blue-600 dark:text-blue-400">Registry</span>
             </h1>
-            <p className="text-[10px] uppercase tracking-widest font-bold text-slate-500 dark:text-slate-400">Container Registry</p>
           </div>
         </div>
       </div>
@@ -22,32 +21,36 @@ export default function SigninPresentation() {
       {/* Description */}
       <div className="space-y-2">
         <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100">
-          Secure image storage for Rasp products.
+          Official Image Distribution
         </h2>
         <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-          A dedicated, lightning-fast OCI registry built to store, sign, and distribute Borga Rasp Docker images effortlessly. Purely a registry, perfected for your workflow.
+          Access and pull official Borga container images securely. We ensure that every release distributed to our customers is verified and enterprise-ready.
         </p>
       </div>
 
       {/* Features */}
       <div className="space-y-4 pt-4">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center border border-blue-100 dark:border-blue-800/30">
-            <Zap className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-          </div>
-          <div>
-            <p className="text-sm font-semibold text-slate-800 dark:text-slate-200">Lightning Fast Pulls</p>
-            <p className="text-xs text-slate-500 dark:text-slate-400">Optimized for high-speed delivery.</p>
-          </div>
-        </div>
-        
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-green-50 dark:bg-green-900/20 flex items-center justify-center border border-green-100 dark:border-green-800/30">
+        <div className="flex items-start gap-3">
+          <div className="w-8 h-8 rounded-lg bg-green-50 dark:bg-green-900/20 flex items-center justify-center border border-green-100 dark:border-green-800/30 shrink-0">
             <ShieldCheck className="w-4 h-4 text-green-600 dark:text-green-400" />
           </div>
           <div>
-            <p className="text-sm font-semibold text-slate-800 dark:text-slate-200">Signed &amp; Verified</p>
-            <p className="text-xs text-slate-500 dark:text-slate-400">Cosign signature verification built-in.</p>
+            <p className="text-sm font-semibold text-slate-800 dark:text-slate-200">Continuous Security</p>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 leading-relaxed">
+              Every image undergoes continuous CVE scanning, is strictly verified, and cryptographically signed to guarantee zero-trust security.
+            </p>
+          </div>
+        </div>
+        
+        <div className="flex items-start gap-3">
+          <div className="w-8 h-8 rounded-lg bg-indigo-50 dark:bg-indigo-900/20 flex items-center justify-center border border-indigo-100 dark:border-indigo-800/30 shrink-0">
+            <Layers className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+          </div>
+          <div>
+            <p className="text-sm font-semibold text-slate-800 dark:text-slate-200">Immutable &amp; Reliable</p>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 leading-relaxed">
+              All distributed versions are immutable and permanently available, ensuring your production environments never break during updates.
+            </p>
           </div>
         </div>
       </div>
