@@ -24,7 +24,7 @@ export default function SigninPresentation() {
           Official Image Distribution
         </h2>
         <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-          Access and pull official Borga container images securely. We ensure that every release distributed to our customers is verified and enterprise-ready.
+          The verified, enterprise-ready distribution hub for official Borga container images.
         </p>
       </div>
 
@@ -37,7 +37,7 @@ export default function SigninPresentation() {
           <div>
             <p className="text-sm font-semibold text-slate-800 dark:text-slate-200">Continuous Security</p>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 leading-relaxed">
-              Every image undergoes continuous CVE scanning, is strictly verified, and cryptographically signed to guarantee zero-trust security.
+              Signed, verified, and continuously scanned for CVEs.
             </p>
           </div>
         </div>
@@ -49,7 +49,7 @@ export default function SigninPresentation() {
           <div>
             <p className="text-sm font-semibold text-slate-800 dark:text-slate-200">Immutable &amp; Reliable</p>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 leading-relaxed">
-              All distributed versions are immutable and permanently available, ensuring your production environments never break during updates.
+              Permanent versions for break-proof production updates.
             </p>
           </div>
         </div>
