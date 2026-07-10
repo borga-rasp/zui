@@ -39,7 +39,7 @@ function TagDetailsMetadata(props) {
 
   const MetaCard = ({ title, content, tooltip, labelTestId }) => {
     return (
-      <div className="MuiCard-root w-full bg-[#111827] border border-slate-800/80 rounded-xl p-4 text-left shadow-md">
+      <div className="MuiCard-root w-full bg-bg-panel border border-slate-800/80 rounded-xl p-4 text-left shadow-md">
         <span className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">
           {title}
         </span>
@@ -61,7 +61,7 @@ function TagDetailsMetadata(props) {
   return (
     <div className="flex flex-col gap-4" data-testid="tagDetailsMetadata-container">
       {/* Pull command */}
-      <div className="MuiCard-root hidden sm:block w-full bg-[#111827] border border-slate-800/80 rounded-xl p-0 overflow-visible shadow-md">
+      <div className="MuiCard-root hidden sm:block w-full bg-bg-panel border border-slate-800/80 rounded-xl p-0 overflow-visible shadow-md">
         <PullCommandButton imageName={imageName || ''} />
       </div>
 

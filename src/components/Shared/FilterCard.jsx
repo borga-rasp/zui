@@ -75,7 +75,7 @@ function FilterCard(props) {
   };
 
   return (
-    <div className="w-full bg-[#111827] border border-slate-800/80 rounded-xl p-5 shadow-lg">
+    <div className="w-full bg-bg-panel border border-slate-800/80 rounded-xl p-5 shadow-lg">
       <h4 className="text-sm font-bold uppercase tracking-wider text-slate-400 mb-4 text-left">
         {title || 'Filter Title'}
       </h4>

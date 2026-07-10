@@ -29,7 +29,7 @@ function RepoDetailsMetadata(props) {
 
   const MetaCard = ({ title, content, tooltip }) => {
     const renderContent = () => (
-      <div className="w-full bg-[#111827] border border-slate-800/80 rounded-xl p-4 text-left shadow-md">
+      <div className="w-full bg-bg-panel border border-slate-800/80 rounded-xl p-4 text-left shadow-md">
         <span className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">
           {title}
         </span>

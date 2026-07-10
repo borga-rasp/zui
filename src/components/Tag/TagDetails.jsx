@@ -175,7 +175,7 @@ function TagDetails() {
       ) : (
         <div className="w-full flex flex-col gap-6 text-left" data-testid="tag-container">
           {/* Main Info Card */}
-          <div className="MuiCard-root bg-[#111827] border border-slate-800/80 rounded-2xl p-6 md:p-8 shadow-xl flex flex-col gap-4">
+          <div className="MuiCard-root bg-bg-panel border border-slate-800/80 rounded-2xl p-6 md:p-8 shadow-xl flex flex-col gap-4">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
               <div className="flex items-center gap-4">
                 <img
@@ -250,7 +250,7 @@ function TagDetails() {
           {/* Main layout: Tab Content (left) and Metadata (right) */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
             {/* Tab content */}
-            <div className="MuiCard-root md:col-span-2 bg-[#111827] border border-slate-800/80 rounded-2xl p-6 shadow-xl">
+            <div className="MuiCard-root md:col-span-2 bg-bg-panel border border-slate-800/80 rounded-2xl p-6 shadow-xl">
               {renderTabContent()}
             </div>
 

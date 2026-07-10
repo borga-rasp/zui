@@ -15,7 +15,7 @@ function FilterDialog(props) {
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 bg-[#090d16] z-[9999] flex flex-col p-6 overflow-y-auto">
+    <div className="fixed inset-0 bg-bg-dark z-[9999] flex flex-col p-6 overflow-y-auto">
       {/* Title */}
       <div className="flex items-center justify-between border-b border-slate-800 pb-4 mb-6">
         <h2 className="text-xl font-bold text-white">Filter Results</h2>
@@ -53,7 +53,7 @@ function FilterDialog(props) {
       </div>
 
       {/* Actions */}
-      <div className="fixed bottom-0 left-0 right-0 bg-[#090d16] border-t border-slate-800 p-4 flex justify-end">
+      <div className="fixed bottom-0 left-0 right-0 bg-bg-dark border-t border-slate-800 p-4 flex justify-end">
         <button
           onClick={handleClose}
           className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 px-6 rounded-lg transition duration-150 cursor-pointer"

@@ -192,7 +192,7 @@ export default function SignIn({ isLoggedIn, setIsLoggedIn, wrapperSetLoading = 
       {isLoading ? (
         <Loading />
       ) : (
-        <div className="w-full bg-[#111827] border border-[#1f2937] shadow-xl rounded-2xl p-8 flex flex-col">
+        <div className="w-full bg-bg-panel border border-bg-border shadow-xl rounded-2xl p-8 flex flex-col">
           <div className="mb-8 text-left">
             <h1 className="text-3xl font-bold text-white mb-2">Sign In</h1>
             <p className="text-slate-400 text-sm">Welcome back! Please login.</p>

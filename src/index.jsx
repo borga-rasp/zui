@@ -4,6 +4,13 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { createRoot } from 'react-dom/client';
 
+// Initialize theme (default to dark)
+if (localStorage.getItem('theme') === 'light') {
+  document.documentElement.classList.remove('dark');
+} else {
+  document.documentElement.classList.add('dark');
+}
+
 const container = document.getElementById('root');
 const root = createRoot(container);
 
