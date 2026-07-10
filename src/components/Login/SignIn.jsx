@@ -194,7 +194,7 @@ export default function SignIn({ isLoggedIn, setIsLoggedIn, wrapperSetLoading = 
       ) : (
         <div className="w-full bg-bg-panel border border-bg-border shadow-xl rounded-2xl p-8 flex flex-col">
           <div className="mb-8 text-left">
-            <h1 className="text-3xl font-bold text-white mb-2">Sign In</h1>
+            <h1 className="text-3xl font-bold text-slate-100 mb-2">Sign In</h1>
             <p className="text-slate-400 text-sm">Welcome back! Please login.</p>
           </div>
 
@@ -223,7 +223,7 @@ export default function SignIn({ isLoggedIn, setIsLoggedIn, wrapperSetLoading = 
                   required
                   className={`w-full bg-slate-900 border ${
                     usernameError ? 'border-red-500 focus:ring-red-500/20 focus:border-red-500' : 'border-slate-700 focus:ring-blue-500/20 focus:border-blue-500'
-                  } rounded-lg py-2.5 px-3.5 text-white placeholder-slate-500 focus:outline-none focus:ring-4 transition duration-200`}
+                  } rounded-lg py-2.5 px-3.5 text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-4 transition duration-200`}
                   placeholder="Enter username"
                   onChange={(e) => handleChange(e, 'username')}
                   onKeyDown={(e) => handleLoginInputFieldKeyDown(e)}
@@ -242,7 +242,7 @@ export default function SignIn({ isLoggedIn, setIsLoggedIn, wrapperSetLoading = 
                   required
                   className={`w-full bg-slate-900 border ${
                     passwordError ? 'border-red-500 focus:ring-red-500/20 focus:border-red-500' : 'border-slate-700 focus:ring-blue-500/20 focus:border-blue-500'
-                  } rounded-lg py-2.5 px-3.5 text-white placeholder-slate-500 focus:outline-none focus:ring-4 transition duration-200`}
+                  } rounded-lg py-2.5 px-3.5 text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-4 transition duration-200`}
                   placeholder="Enter password"
                   onChange={(e) => handleChange(e, 'password')}
                   onKeyDown={(e) => handleLoginInputFieldKeyDown(e)}

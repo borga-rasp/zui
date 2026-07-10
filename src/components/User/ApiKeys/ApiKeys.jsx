@@ -71,7 +71,7 @@ function ApiKeys() {
           {/* Header section */}
           <div className="MuiCard-root bg-bg-panel border border-slate-800/80 rounded-2xl p-6 shadow-xl flex flex-col gap-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <h1 className="text-2xl font-bold text-white tracking-tight">
+              <h1 className="text-2xl font-bold text-slate-100 tracking-tight">
                 Manage your API Keys
               </h1>
               <button

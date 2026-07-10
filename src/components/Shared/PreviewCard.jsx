@@ -61,7 +61,7 @@ function PreviewCard(props) {
           className="w-6 h-6 object-contain rounded"
         />
         <Tooltip title={name}>
-          <h4 className="text-sm font-bold text-white group-hover:text-blue-400 transition truncate max-w-[100px]">
+          <h4 className="text-sm font-bold text-slate-100 group-hover:text-blue-400 transition truncate max-w-[100px]">
             {name}
           </h4>
         </Tooltip>

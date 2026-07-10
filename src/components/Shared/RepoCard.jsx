@@ -226,7 +226,7 @@ function RepoCard(props) {
               className="w-6 h-6 object-contain rounded"
             />
             <Tooltip title={name}>
-              <h3 className="text-lg font-bold text-white tracking-tight group-hover:text-blue-400 transition-colors duration-150 truncate max-w-sm sm:max-w-md md:max-w-lg">
+              <h3 className="text-lg font-bold text-slate-100 tracking-tight group-hover:text-blue-400 transition-colors duration-150 truncate max-w-sm sm:max-w-md md:max-w-lg">
                 {name}
               </h3>
             </Tooltip>

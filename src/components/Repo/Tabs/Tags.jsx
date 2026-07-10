@@ -101,7 +101,7 @@ export default function Tags(props) {
   return (
     <div className="flex flex-col gap-4 text-left">
       <div className="flex flex-row justify-between items-center border-b border-slate-800 pb-3">
-        <h2 className="text-xl font-bold text-white tracking-tight">
+        <h2 className="text-xl font-bold text-slate-100 tracking-tight">
           Tags History
         </h2>
         <div className="flex items-center gap-2">
@@ -120,7 +120,7 @@ export default function Tags(props) {
           placeholder="Search tags..."
           value={tagsFilter}
           onChange={handleTagsFilterChange}
-          className="w-full bg-transparent text-sm text-white placeholder-slate-500 focus:outline-none"
+          className="w-full bg-transparent text-sm text-slate-100 placeholder-slate-500 focus:outline-none"
         />
         <Search className="w-4 h-4 text-slate-400 shrink-0 ml-2" />
       </div>

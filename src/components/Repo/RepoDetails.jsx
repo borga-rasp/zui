@@ -193,7 +193,7 @@ function RepoDetails() {
                   alt="icon"
                   className="w-8 h-8 object-contain rounded"
                 />
-                <h1 className="text-3xl font-extrabold text-white tracking-tight">
+                <h1 className="text-3xl font-extrabold text-slate-100 tracking-tight">
                   {name}
                 </h1>
               </div>

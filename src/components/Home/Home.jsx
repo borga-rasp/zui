@@ -217,7 +217,7 @@ function Home() {
         {/* Most popular Section */}
         <div className="w-full flex flex-col gap-6">
           <div className="flex flex-row justify-between items-end border-b border-slate-800 pb-3">
-            <h2 className="text-2xl font-bold text-white tracking-tight">
+            <h2 className="text-2xl font-bold text-slate-100 tracking-tight">
               Most popular images
             </h2>
             <button
@@ -233,7 +233,7 @@ function Home() {
         {/* Recently updated Section */}
         <div className="w-full flex flex-col gap-6">
           <div className="flex flex-row justify-between items-end border-b border-slate-800 pb-3">
-            <h2 className="text-2xl font-bold text-white tracking-tight">
+            <h2 className="text-2xl font-bold text-slate-100 tracking-tight">
               Recently updated images
             </h2>
             <button
@@ -250,7 +250,7 @@ function Home() {
         {!isEmpty(bookmarkData) && (
           <div className="w-full flex flex-col gap-6">
             <div className="flex flex-row justify-between items-end border-b border-slate-800 pb-3">
-              <h2 className="text-2xl font-bold text-white tracking-tight">
+              <h2 className="text-2xl font-bold text-slate-100 tracking-tight">
                 Bookmarks
               </h2>
               <button
@@ -268,7 +268,7 @@ function Home() {
         {!isEmpty(starData) && (
           <div className="w-full flex flex-col gap-6">
             <div className="flex flex-row justify-between items-end border-b border-slate-800 pb-3">
-              <h2 className="text-2xl font-bold text-white tracking-tight">
+              <h2 className="text-2xl font-bold text-slate-100 tracking-tight">
                 Stars
               </h2>
               <button
