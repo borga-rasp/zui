@@ -221,7 +221,7 @@ export default function SignIn({ isLoggedIn, setIsLoggedIn, wrapperSetLoading = 
                   name="username"
                   type="text"
                   required
-                  className={`w-full bg-slate-900 border ${
+                  className={`w-full bg-slate-950 border ${
                     usernameError ? 'border-red-500 focus:ring-red-500/20 focus:border-red-500' : 'border-slate-700 focus:ring-blue-500/20 focus:border-blue-500'
                   } rounded-lg py-2.5 px-3.5 text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-4 transition duration-200`}
                   placeholder="Enter username"
@@ -240,7 +240,7 @@ export default function SignIn({ isLoggedIn, setIsLoggedIn, wrapperSetLoading = 
                   name="password"
                   type="password"
                   required
-                  className={`w-full bg-slate-900 border ${
+                  className={`w-full bg-slate-950 border ${
                     passwordError ? 'border-red-500 focus:ring-red-500/20 focus:border-red-500' : 'border-slate-700 focus:ring-blue-500/20 focus:border-blue-500'
                   } rounded-lg py-2.5 px-3.5 text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-4 transition duration-200`}
                   placeholder="Enter password"

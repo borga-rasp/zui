@@ -163,3 +163,8 @@ code {
 a {
   text-decoration: none;
 }
+
+/* Light mode hover contrast override */
+html:not(.dark) .hover\:text-white:hover {
+  color: var(--slate-100) !important;
+}
