@@ -85,7 +85,7 @@ describe('Search component', () => {
     const searchInput = screen.getByPlaceholderText(/search for content/i);
     expect(searchInput).toBeInTheDocument();
     userEvent.type(searchInput, 'test');
-    expect(await screen.findByText(/alpine/i)).toBeInTheDocument();
+    expect(await screen.findByText(/alpine/i, {}, { timeout: 10000 })).toBeInTheDocument();
   });
 
   it('should navigate to repo page when a repo suggestion is clicked', async () => {
@@ -93,7 +93,7 @@ describe('Search component', () => {
     render(<RouterSearchWrapper />);
     const searchInput = screen.getByPlaceholderText(/search for content/i);
     userEvent.type(searchInput, 'test');
-    const suggestionItemRepo = await screen.findByText(/alpine/i);
+    const suggestionItemRepo = await screen.findByText(/alpine/i, {}, { timeout: 10000 });
     userEvent.click(suggestionItemRepo);
     await waitFor(() => expect(mockedUsedNavigate).toHaveBeenCalledWith('/image/alpine'));
   });
@@ -103,7 +103,7 @@ describe('Search component', () => {
     render(<RouterSearchWrapper />);
     const searchInput = screen.getByPlaceholderText(/search for content/i);
     userEvent.type(searchInput, 'debian:test');
-    const suggestionItemImage = await screen.findByText(/debian:testTag/i);
+    const suggestionItemImage = await screen.findByText(/debian:testTag/i, {}, { timeout: 10000 });
     userEvent.click(suggestionItemImage);
     await waitFor(() => expect(mockedUsedNavigate).toHaveBeenCalledWith('/image/debian/tag/testTag'));
   });

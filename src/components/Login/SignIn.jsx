@@ -1,6 +1,7 @@
 // react global
 import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
+import { User, Lock } from 'lucide-react';
 
 // utility
 import { api, endpoints } from '../../api';
@@ -178,7 +179,7 @@ export default function SignIn({ isLoggedIn, setIsLoggedIn, wrapperSetLoading = 
     let oidcName = authMethods.openid?.providers?.oidc?.name;
 
     return (
-      <div className="flex flex-col gap-3 w-full mb-6">
+      <div className="flex flex-col gap-3 w-full">
         {isGithub && <GithubLoginButton handleClick={handleClickExternalLogin} />}
         {isGoogle && <GoogleLoginButton handleClick={handleClickExternalLogin} />}
         {isGitlab && <GitlabLoginButton handleClick={handleClickExternalLogin} />}
@@ -192,10 +193,10 @@ export default function SignIn({ isLoggedIn, setIsLoggedIn, wrapperSetLoading = 
       {isLoading ? (
         <Loading />
       ) : (
-        <div className="w-full bg-bg-panel border border-bg-border shadow-xl rounded-2xl p-8 flex flex-col">
-          <div className="mb-8 text-left">
-            <h1 className="text-3xl font-bold text-slate-100 mb-2">Sign In</h1>
-            <p className="text-slate-400 text-sm">Welcome back! Please login.</p>
+        <div className="w-full bg-white dark:bg-slate-900/40 backdrop-blur-xl border border-slate-200/60 dark:border-slate-800/80 shadow-2xl shadow-slate-100 dark:shadow-none rounded-2xl p-8 flex flex-col gap-6">
+          <div className="text-left">
+            <h1 className="text-3xl font-extrabold text-slate-100 tracking-tight mb-2">Borga Rasp</h1>
+            <p className="text-slate-500 dark:text-slate-400 text-sm">Sign in to manage your edge container registry.</p>
           </div>
 
           {renderThirdPartyLoginMethods()}
@@ -203,68 +204,78 @@ export default function SignIn({ isLoggedIn, setIsLoggedIn, wrapperSetLoading = 
           {Object.keys(authMethods).length > 1 &&
             Object.keys(authMethods).includes('openid') &&
             Object.keys(authMethods.openid.providers).length > 0 && (
-              <div className="relative flex py-4 items-center w-full" data-testid="openid-divider">
-                <div className="flex-grow border-t border-slate-700"></div>
-                <span className="flex-shrink mx-4 text-slate-500 text-sm">or</span>
-                <div className="flex-grow border-t border-slate-700"></div>
+              <div className="relative flex py-1 items-center w-full" data-testid="openid-divider">
+                <div className="flex-grow border-t border-slate-200 dark:border-slate-850"></div>
+                <span className="flex-shrink mx-4 text-slate-400 dark:text-slate-500 text-[10px] font-bold uppercase tracking-wider">or</span>
+                <div className="flex-grow border-t border-slate-200 dark:border-slate-850"></div>
               </div>
             )}
 
           {Object.keys(authMethods).includes('htpasswd') && (
             <form onSubmit={(e) => e.preventDefault()} className="space-y-5" noValidate autoComplete="off">
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-1.5" htmlFor="username">
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2" htmlFor="username">
                   Username
                 </label>
-                <input
-                  id="username"
-                  name="username"
-                  type="text"
-                  required
-                  className={`w-full bg-slate-950 border ${
-                    usernameError ? 'border-red-500 focus:ring-red-500/20 focus:border-red-500' : 'border-slate-700 focus:ring-blue-500/20 focus:border-blue-500'
-                  } rounded-lg py-2.5 px-3.5 text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-4 transition duration-200`}
-                  placeholder="Enter username"
-                  onChange={(e) => handleChange(e, 'username')}
-                  onKeyDown={(e) => handleLoginInputFieldKeyDown(e)}
-                />
-                {usernameError && <p className="mt-1 text-xs text-red-500">{usernameError}</p>}
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 dark:text-slate-500">
+                    <User className="w-4 h-4" />
+                  </div>
+                  <input
+                    id="username"
+                    name="username"
+                    type="text"
+                    required
+                    className={`w-full bg-slate-950 border ${
+                      usernameError ? 'border-red-500 focus:ring-red-500/20 focus:border-red-500' : 'border-slate-200 dark:border-slate-800/80 focus:ring-blue-500/10 focus:border-blue-500'
+                    } rounded-xl py-2.5 pl-10 pr-3.5 text-slate-100 placeholder-slate-500 dark:placeholder-slate-600 focus:outline-none focus:ring-4 transition duration-200 text-sm`}
+                    placeholder="Enter username"
+                    onChange={(e) => handleChange(e, 'username')}
+                    onKeyDown={(e) => handleLoginInputFieldKeyDown(e)}
+                  />
+                </div>
+                {usernameError && <p className="mt-1.5 text-xs text-red-500 font-semibold">{usernameError}</p>}
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-1.5" htmlFor="password">
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2" htmlFor="password">
                   Enter Password
                 </label>
-                <input
-                  id="password"
-                  name="password"
-                  type="password"
-                  required
-                  className={`w-full bg-slate-950 border ${
-                    passwordError ? 'border-red-500 focus:ring-red-500/20 focus:border-red-500' : 'border-slate-700 focus:ring-blue-500/20 focus:border-blue-500'
-                  } rounded-lg py-2.5 px-3.5 text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-4 transition duration-200`}
-                  placeholder="Enter password"
-                  onChange={(e) => handleChange(e, 'password')}
-                  onKeyDown={(e) => handleLoginInputFieldKeyDown(e)}
-                />
-                {passwordError && <p className="mt-1 text-xs text-red-500">{passwordError}</p>}
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 dark:text-slate-500">
+                    <Lock className="w-4 h-4" />
+                  </div>
+                  <input
+                    id="password"
+                    name="password"
+                    type="password"
+                    required
+                    className={`w-full bg-slate-950 border ${
+                      passwordError ? 'border-red-500 focus:ring-red-500/20 focus:border-red-500' : 'border-slate-200 dark:border-slate-800/80 focus:ring-blue-500/10 focus:border-blue-500'
+                    } rounded-xl py-2.5 pl-10 pr-3.5 text-slate-100 placeholder-slate-500 dark:placeholder-slate-600 focus:outline-none focus:ring-4 transition duration-200 text-sm`}
+                    placeholder="Enter password"
+                    onChange={(e) => handleChange(e, 'password')}
+                    onKeyDown={(e) => handleLoginInputFieldKeyDown(e)}
+                  />
+                </div>
+                {passwordError && <p className="mt-1.5 text-xs text-red-500 font-semibold">{passwordError}</p>}
               </div>
 
               {requestProcessing && (
                 <div className="flex justify-center py-2">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+                  <div className="animate-spin rounded-full h-7 w-7 border-b-2 border-blue-500"></div>
                 </div>
               )}
 
               {requestError && (
-                <div className="bg-red-500/10 border border-red-500/30 text-red-400 text-sm rounded-lg p-3.5 text-left">
+                <div className="bg-red-500/10 border border-red-500/30 text-red-500 text-xs rounded-xl p-3.5 text-left font-medium">
                   Authentication Failed. Please try again.
                 </div>
               )}
 
               <button
                 type="button"
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition duration-200 shadow-md cursor-pointer hover:shadow-lg focus:outline-none focus:ring-4 focus:ring-blue-500/30 text-lg"
+                className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold py-2.5 px-4 rounded-xl transition duration-200 shadow-md hover:shadow-lg shadow-blue-500/10 dark:shadow-none active:scale-[0.98] cursor-pointer text-sm"
                 onClick={handleClick}
                 data-testid="basic-auth-submit-btn"
               >
@@ -276,7 +287,7 @@ export default function SignIn({ isLoggedIn, setIsLoggedIn, wrapperSetLoading = 
           {isGuestLoginEnabled && (
             <button
               type="button"
-              className="w-full mt-4 bg-transparent hover:bg-slate-800 border border-slate-600 text-slate-300 hover:text-white font-semibold py-3 px-4 rounded-lg transition duration-200 cursor-pointer text-lg"
+              className="w-full bg-transparent hover:bg-slate-50 dark:hover:bg-slate-800/60 border border-slate-200 dark:border-slate-800 text-slate-400 dark:text-slate-300 hover:text-slate-100 font-semibold py-2.5 px-4 rounded-xl transition duration-200 cursor-pointer text-sm active:scale-[0.98]"
               onClick={handleGuestClick}
             >
               Continue as guest
