@@ -1,6 +1,6 @@
 const hostConfig = {
-  auto: true,
-  default: 'http://localhost:5000'
+  auto: false,
+  default: 'https://registry.borgasecurity.xyz'
 };
 
 const host = (manualHost = null) => {

@@ -61,7 +61,7 @@ function TagDetailsMetadata(props) {
   return (
     <div className="flex flex-col gap-4" data-testid="tagDetailsMetadata-container">
       {/* Pull command */}
-      <div className="MuiCard-root hidden sm:block w-full bg-[#111827] border border-slate-800/80 rounded-xl p-0 overflow-hidden shadow-md">
+      <div className="MuiCard-root hidden sm:block w-full bg-[#111827] border border-slate-800/80 rounded-xl p-0 overflow-visible shadow-md">
         <PullCommandButton imageName={imageName || ''} />
       </div>
 
