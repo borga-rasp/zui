@@ -2,7 +2,7 @@ import React from 'react';
 
 export default function SigninPresentation() {
   return (
-    <div className="min-h-full w-full bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-950 flex flex-col items-center justify-center p-8 text-center relative overflow-hidden border-r border-slate-800" data-testid="presentation-container">
+    <div className="min-h-full w-full bg-gradient-to-br from-slate-50 via-indigo-50 to-slate-100 dark:from-slate-900 dark:via-indigo-950 dark:to-slate-950 flex flex-col items-center justify-center p-8 text-center relative overflow-hidden border-r border-slate-200 dark:border-slate-800" data-testid="presentation-container">
       {/* Decorative background glow */}
       <div className="absolute top-1/4 left-1/4 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute bottom-1/4 right-1/4 translate-x-1/2 translate-y-1/2 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
@@ -15,19 +15,19 @@ export default function SigninPresentation() {
             </svg>
           </div>
           <div className="space-y-1">
-            <h1 className="text-4xl font-extrabold tracking-tight bg-gradient-to-r from-blue-400 via-indigo-200 to-cyan-400 bg-clip-text text-transparent">
+            <h1 className="text-4xl font-extrabold tracking-tight bg-gradient-to-r from-blue-700 via-indigo-600 to-indigo-800 dark:from-blue-400 dark:via-indigo-200 dark:to-cyan-400 bg-clip-text text-transparent">
               BORGA
             </h1>
-            <p className="text-xs uppercase tracking-widest text-slate-400 font-semibold">
+            <p className="text-xs uppercase tracking-widest text-slate-500 dark:text-slate-400 font-semibold">
               Registry Server
             </p>
           </div>
         </div>
 
-        <h2 className="text-3xl font-extrabold text-white leading-snug tracking-tight">
+        <h2 className="text-3xl font-extrabold text-slate-900 dark:text-white leading-snug tracking-tight">
           OCI-native container image registry, simplified
         </h2>
-        <p className="text-slate-400 text-sm">
+        <p className="text-slate-600 dark:text-slate-400 text-sm">
           A secure, lightning-fast container registry for all your container images, OCI artifacts, and Helm charts.
         </p>
       </div>
