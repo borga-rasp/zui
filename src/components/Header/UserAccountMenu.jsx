@@ -41,25 +41,25 @@ function UserAccountMenu() {
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-48 rounded-lg bg-slate-800 border border-slate-700 shadow-xl py-1 z-50 animate-in fade-in duration-100">
-          <div className="px-4 py-2 text-sm text-slate-200 font-medium truncate border-b border-slate-700">
+        <div className="absolute right-0 mt-2 w-48 rounded-lg bg-slate-900 border border-slate-800 shadow-xl py-1 z-50 animate-in fade-in duration-100">
+          <div className="px-4 py-2 text-sm text-slate-200 font-medium truncate border-b border-slate-800">
             {getLoggedInUser()}
           </div>
           {isApiKeyEnabled() && (
             <>
               <button
                 onClick={apiKeyManagement}
-                className="w-full text-left px-4 py-2.5 text-sm text-slate-300 hover:bg-slate-700 hover:text-white transition cursor-pointer"
+                className="w-full text-left px-4 py-2.5 text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition cursor-pointer"
                 data-testid="api-keys-menu-item"
               >
                 API Keys
               </button>
-              <div className="border-t border-slate-700" data-testid="api-keys-menu-item-divider" />
+              <div className="border-t border-slate-800" data-testid="api-keys-menu-item-divider" />
             </>
           )}
           <button
             onClick={logoutUser}
-            className="w-full text-left px-4 py-2.5 text-sm text-red-400 hover:bg-slate-700 hover:text-red-300 transition cursor-pointer"
+            className="w-full text-left px-4 py-2.5 text-sm text-red-400 hover:bg-slate-800 hover:text-red-300 transition cursor-pointer"
           >
             Log out
           </button>

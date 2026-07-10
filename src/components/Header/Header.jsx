@@ -80,7 +80,7 @@ function Header({ setSearchCurrentValue = () => {} }) {
 
   return (
     <header
-      className={`fixed top-0 left-0 w-full h-16 bg-[#0b0f19]/80 backdrop-blur-md border-b border-slate-800 z-[1000] transition-transform duration-300 ${
+      className={`fixed top-0 left-0 w-full h-16 bg-bg-dark/80 backdrop-blur-md border-b border-slate-800 z-[1000] transition-transform duration-300 ${
         show ? 'translate-y-0' : '-translate-y-full'
       }`}
     >
