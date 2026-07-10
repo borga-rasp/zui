@@ -39,8 +39,11 @@ function LoginPage({ isLoggedIn, setIsLoggedIn }) {
       </div>
 
       {/* Right Side: Form (Adapts to system theme) */}
-      <div className={`flex w-full lg:w-1/2 flex-col justify-center items-center p-8 sm:p-16 relative bg-white dark:bg-slate-900 ${isLoading ? 'hidden' : ''}`}>
-        <div className="relative z-10 w-full max-w-md flex justify-center">
+      <div className={`flex w-full lg:w-1/2 flex-col justify-center items-center p-8 sm:p-16 relative bg-slate-50 dark:bg-slate-950 ${isLoading ? 'hidden' : ''}`}>
+        {/* Subtle background dots for texture on the right side */}
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none" />
+        
+        <div className="relative z-10 w-full flex justify-center">
           <SignIn isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} wrapperSetLoading={setIsLoading} />
         </div>
       </div>

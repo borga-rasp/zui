@@ -193,7 +193,7 @@ export default function SignIn({ isLoggedIn, setIsLoggedIn, wrapperSetLoading = 
       {isLoading ? (
         <Loading />
       ) : (
-        <div className="w-full max-w-sm mx-auto flex flex-col gap-6">
+        <div className="w-full max-w-md mx-auto bg-white dark:bg-slate-900/60 backdrop-blur-2xl border border-slate-200/80 dark:border-slate-800/80 shadow-2xl shadow-slate-200/40 dark:shadow-none rounded-3xl p-8 sm:p-10 flex flex-col gap-6">
           <div className="text-left">
             <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100 tracking-tight mb-1.5">Sign In</h1>
             <p className="text-slate-500 dark:text-slate-400 text-sm">Enter your credentials to access your registry.</p>
