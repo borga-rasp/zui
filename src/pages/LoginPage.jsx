@@ -12,10 +12,8 @@ function LoginPage({ isLoggedIn, setIsLoggedIn }) {
 
   return (
     <div className="flex min-h-screen w-full" data-testid="login-container">
-      {isLoading && <Loading />}
-
       {/* Left Side: Presentation (Always Dark Theme) */}
-      <div className={`hidden lg:flex w-1/2 bg-slate-950 relative overflow-hidden flex-col justify-center items-center p-12 lg:p-24 ${isLoading ? 'hidden' : ''}`}>
+      <div className="hidden lg:flex w-1/2 bg-slate-950 relative overflow-hidden flex-col justify-center items-center p-12 lg:p-24">
         
         {/* Absolute Brand Header */}
         <div className="absolute top-12 left-12 flex items-center gap-4 z-20">
@@ -39,7 +37,7 @@ function LoginPage({ isLoggedIn, setIsLoggedIn }) {
       </div>
 
       {/* Right Side: Form (Adapts to system theme) */}
-      <div className={`flex w-full lg:w-1/2 flex-col justify-center items-center p-8 sm:p-16 relative bg-slate-50 dark:bg-slate-950 ${isLoading ? 'hidden' : ''}`}>
+      <div className="flex w-full lg:w-1/2 flex-col justify-center items-center p-8 sm:p-16 relative bg-slate-50 dark:bg-slate-950">
         {/* Subtle background dots for texture on the right side */}
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none" />
         
